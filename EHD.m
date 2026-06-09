@@ -15,9 +15,9 @@ max_steps=60000000; % maximum time steps
 p=zeros(ny,nx);   % presuure
 so=zeros(ny,nx); 
 f=zeros(ny,nx,9); % distribution function for phase field
-h =zeros(ny,nx,9); % distribution function for electric field
-ht=zeros(ny,nx,9); % streaming
-h_eq=zeros(ny,nx,9);
+h =zeros(ny,nx,5); % distribution function for electric field
+ht=zeros(ny,nx,5); % streaming
+h_eq=zeros(ny,nx,5);
 g=zeros(ny,nx,9); % distribution function for the fluid flow
 gt=zeros(ny,nx,9);
 g_eq=zeros(ny,nx,9);
@@ -71,7 +71,7 @@ wt=[4/9 1/9 1/9 1/9 1/9 1/36 1/36 1/36 1/36];
 wwt=[1/3 1/6 1/6 1/6 1/6];
 phi=zeros(ny,nx);
 phi_h=1;
-phi_l=0;
+phi_l=-1;
 rho_H=1;
 rho_L=1;
 nu_H=0.1;
@@ -98,21 +98,15 @@ phi_enew=zeros(ny,nx);
 phi_e(1, :)=0;  % top boundary (y = 1)
 phi_e(282, :)=28.2;  % bottom boundary (y = ny)
 PH=zeros(ny,nx);
-%%%%%% New Definition %%%%%
-dG=zeros(ny,nx,9);   %%% new
-dGt=zeros(ny,nx,9);%% new
 
-
-% for i=1:ny
-% for j=1:nx   
-%    phi(i,j)=((phi_h+phi_l)/2)+((phi_h-phi_l)/2)*tanh(2*(R1-sqrt((j-141)^2+(i-141)^2))/W);
-% end
-% end
 for i=1:ny
 for j=1:nx   
- phi(i,j)=0.5+0.5*tanh(2*(R1-sqrt((j-141)^2+(i-141)^2))/W);
+   phi(i,j)=((phi_h+phi_l)/2)+((phi_h-phi_l)/2)*tanh(2*(R1-sqrt((j-141)^2+(i-141)^2))/W);
 end
 end
+
+
+
 for j=1:nx   
 phi(1,j)=phi(2,j) ; 
 phi(ny,j)=phi(ny-1,j) ;
@@ -122,51 +116,34 @@ end
 
 for i =1:ny
 for j =1:nx
-      %rho(i,j)=((rho_H-rho_L)/2)*phi(i,j)+(rho_H+rho_L)/2;
-      rho(i,j)=((rho_H-rho_L))*phi(i,j)+rho_L;
+
+      rho(i,j)=((rho_H-rho_L)/2)*phi(i,j)+(rho_H+rho_L)/2;
       p(i,j)=rho(i,j)/3;
-     % nu(i,j)=((nu_H-nu_L)/2)*phi(i,j)+(nu_H+nu_L)/2;
-     nu(i,j)=((nu_H-nu_L))*phi(i,j)+nu_L;
-     % sigma(i,j)=((sigma_H-sigma_L)/2)*phi(i,j)+(sigma_H+sigma_L)/2;
-     % epsi(i,j)=((epsi_H-epsi_L)/2)*phi(i,j)+(epsi_H+epsi_L)/2;
-     sigma(i,j)=((sigma_H-sigma_L))*phi(i,j)+sigma_L;
-     epsi(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+epsi_L;
+     nu(i,j)=((nu_H-nu_L)/2)*phi(i,j)+(nu_H+nu_L)/2;
+     sigma(i,j)=((sigma_H-sigma_L)/2)*phi(i,j)+(sigma_H+sigma_L)/2;
+     epsi(i,j)=((epsi_H-epsi_L)/2)*phi(i,j)+(epsi_H+epsi_L)/2;
 end
 end
-% initialization of phase field distribution function
-% for i=1:ny
-% for j=1:nx
-% for k=1:9
-% f(i,j,k)=wt(k)*phi(i,j)*(1+3*(ex(k)*ux(i,j)+ey(k)*uy(i,j)));
-% end
-% end
-% end
-%% STEP 2 %%%%%%%% initialization  for phase field  distribution function
 for i=1:ny
 for j=1:nx
 for k=1:9
-    if k==1
-f(i,j,k)=phi(i,j)-(1-wt(k))*(4*bita*phi(i,j)*(phi(i,j)-0.5)*(phi(i,j)-1)-kappa*L_phi(i,j)-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*(E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j)));
-    else
-f(i,j,k)=wt(k)*(4*bita*phi(i,j)*(phi(i,j)-0.5)*(phi(i,j)-1)-kappa*L_phi(i,j)-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*(E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j)));
-   end
+f(i,j,k)=wt(k)*phi(i,j)*(1+3*(ex(k)*ux(i,j)+ey(k)*uy(i,j)));
 end
 end
 end
-
 %% initialization  for potential distribution function
 for i=1:ny
     for j=1:nx
-        for k=1:9
+        for k=1:5
            if k==1
-                h(i,j,k)=(wt(k)-1)*phi_e(i,j);
+                h(i,j,k)=(wwt(k)-1)*phi_e(i,j);
             else
-                h(i,j,k)=wt(k)*phi_e(i,j);   
+                h(i,j,k)=wwt(k)*phi_e(i,j);   
            end
         end
      end
 end
-%% initialization  for hydrodynamic distribution function 
+% %% initialization  for hydrodynamic distribution function 
 
 for i=2:ny-1
  for j=1:nx
@@ -177,8 +154,8 @@ for i=2:ny-1
       end
   end
 end
-
-%% Initialization of  Distribution function for fluid flow
+%%%%%%%%%%%%%%%%%%%%%%%%%distribution function for fluid flow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for i=2:ny-1
     for j=1:nx
@@ -203,7 +180,7 @@ ux_old(i,j)=ux(i,j);
 end
 end
 
-%% Calculation of hydrodynamic pressure %%
+% %%%%%calculation of hydrodynamic pressure %%%%%%%%%%
 for i =2:ny-1
  for j =1:nx
      for k = 1
@@ -248,8 +225,8 @@ for i=2:ny-1
    end 
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% loop starts from here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%loop starts from here
+% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for st=1:10000000000
     fprintf('st = %d\n', st);
     % pause(0.2)
@@ -258,13 +235,13 @@ for step=1:1000
     % pause(0.5)
    fprintf('step = %d\n', step);
    fprintf('error = %d\n', error);
-% for i = 2:ny-1
-%     for j =1:nx
-%         dCu_x(i,j) = (phi_new(i,j)*ux_new(i,j)-phi_old(i,j)*ux_old(i,j));
-%         dCu_y(i,j) = (phi_new(i,j)*uy_new(i,j)-phi_old(i,j)*uy_old(i,j));
-% 
-%     end
-% end
+for i = 2:ny-1
+    for j =1:nx
+        dCu_x(i,j) = (phi_new(i,j)*ux_new(i,j)-phi_old(i,j)*ux_old(i,j));
+        dCu_y(i,j) = (phi_new(i,j)*uy_new(i,j)-phi_old(i,j)*uy_old(i,j));
+
+    end
+end
 % %%%%%%%%%%%%neumann boundary condition for phase field
 % for i=2:ny-1
 % for j=1:nx   
@@ -274,14 +251,7 @@ for step=1:1000
 % mu(ny,j)= mu(ny-1,j);
 % end
 % end
-for i = 2:ny-1
-    for j =1:nx
-        for k=1:9
-        dG(i,j,k) = wt(k)*(g_phix(i,j)*ux_new(i,j)+g_phiy(i,j)*uy_new(i,j))*(1.5*(ex(k)*ex(k)+ey(k)*ey(k))-2);
-        dGt(i,j,k) = (wt(k)*(g_phix(i,j)*ux_new(i,j)+g_phiy(i,j)*uy_new(i,j))*(1.5*(ex(k)*ex(k)+ey(k)*ey(k))-2))-(wt(k)*(g_phix(i,j)*ux_old(i,j)+g_phiy(i,j)*uy_old(i,j))*(1.5*(ex(k)*ex(k)+ey(k)*ey(k))-2));
-        end
-    end
-end
+
 for i = 2:ny-1
     for j =1:nx
         phi_old(i,j)=phi(i,j);
@@ -342,43 +312,22 @@ L_phi(i,j)=tempx1*6;
 end
 %%%%% calculation of force for phase field source term %%%%
 
-% for i=2:ny-1
-%     for j=1:nx
-% 
-%         Fx(i,j) =((1/(3*W))*(g_phix(i,j)/z(i,j))*2*(1-phi(i,j)^2))+dCu_x(i,j);
-%         Fy(i,j) =((1/(3*W))*(g_phiy(i,j)/z(i,j))*2*(1-phi(i,j)^2))+dCu_y(i,j);
-% 
-%         for k = 1:9
-%             F(i,j,k) =(3*wt(k))*(ex(k)*Fx(i,j)+ey(k)*Fy(i,j));
-%         end
-%     end
-% end
-% for i=2:ny-1
-%     for j=1:nx
-%         for k = 1:9
-%           f_eq(i,j,k) =wt(k)*phi(i,j)*(1+3*(ex(k)*ux(i,j)+ey(k)*uy(i,j)));
-%           ft(i,j,k)=-1.25*((f(i,j,k)-f_eq(i,j,k)))+f(i,j,k)+0.375*F(i,j,k);
-%         end
-%     end
-% end
+for i=2:ny-1
+    for j=1:nx
 
-% %%% calculation of the equilibrium distribution function for Cahn-Hilliard
-for i=1:ny
-for j=1:nx
-for k=1:9
-    if k==1
-f_eq(i,j,k)=phi(i,j)-(1-wt(k))*(4*bita*phi(i,j)*(phi(i,j)-0.5)*(phi(i,j)-1)-kappa*L_phi(i,j)-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*(E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j)));
-    else
-f_eq(i,j,k)=wt(k)*(4*bita*phi(i,j)*(phi(i,j)-0.5)*(phi(i,j)-1)-kappa*L_phi(i,j)-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*(E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j)));
-   end
+        Fx(i,j) =((1/(3*W))*(g_phix(i,j)/z(i,j))*2*(1-phi(i,j)^2))+dCu_x(i,j);
+        Fy(i,j) =((1/(3*W))*(g_phiy(i,j)/z(i,j))*2*(1-phi(i,j)^2))+dCu_y(i,j);
+        
+        for k = 1:9
+            F(i,j,k) =(3*wt(k))*(ex(k)*Fx(i,j)+ey(k)*Fy(i,j));
+        end
+    end
 end
-end
-end
-% %%%%% calculation of force for phase field source term %%%%
 for i=2:ny-1
     for j=1:nx
         for k = 1:9
-          ft(i,j,k)=-1.25*((f(i,j,k)-f_eq(i,j,k)))+f(i,j,k)+dG(i,j,k)+0.5*dGt(i,j,k);
+          f_eq(i,j,k) =wt(k)*phi(i,j)*(1+3*(ex(k)*ux(i,j)+ey(k)*uy(i,j)));
+          ft(i,j,k)=-1.25*((f(i,j,k)-f_eq(i,j,k)))+f(i,j,k)+0.375*F(i,j,k);
         end
     end
 end
@@ -442,25 +391,15 @@ end
 % end
 % %%% calculation of equation 19
 % 
-% for i = 1:ny
-% for j = 1:nx
-% 
-%     rho(i,j)=((rho_H-rho_L)/2)*phi(i,j)+(rho_H+rho_L)/2;
-%     nu(i,j)=((nu_H-nu_L)/2)*phi(i,j)+(nu_H+nu_L)/2;
-%     sigma(i,j)=((sigma_H-sigma_L)/2)*phi(i,j)+(sigma_H+sigma_L)/2;
-%     epsi(i,j)=((epsi_H-epsi_L)/2)*phi(i,j)+(epsi_H+epsi_L)/2;
-% end
-% end
+for i = 1:ny
+for j = 1:nx
 
-for i =1:ny
-for j =1:nx
-     rho(i,j)=((rho_H-rho_L))*phi(i,j)+rho_L;
-     nu(i,j)=((nu_H-nu_L))*phi(i,j)+nu_L;
-     sigma(i,j)=((sigma_H-sigma_L))*phi(i,j)+sigma_L;
-     epsi(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+epsi_L;
+    rho(i,j)=((rho_H-rho_L)/2)*phi(i,j)+(rho_H+rho_L)/2;
+    nu(i,j)=((nu_H-nu_L)/2)*phi(i,j)+(nu_H+nu_L)/2;
+    sigma(i,j)=((sigma_H-sigma_L)/2)*phi(i,j)+(sigma_H+sigma_L)/2;
+    epsi(i,j)=((epsi_H-epsi_L)/2)*phi(i,j)+(epsi_H+epsi_L)/2;
 end
 end
-
 %%% defining the gradient  new phi and new laplace phi
 
 for i=2:ny-1
@@ -515,22 +454,9 @@ end
 
 % % calculation of mu
 
-% for i=2:ny-1
-%     for j=1:nx
-%  mu(i,j)=4*bita*phi(i,j)*(phi(i,j)-1)*(phi(i,j)+1)-kappa*L_phi(i,j);
-%     end
-% end
-% % % calculation of mu according to Cahn-Hilliard equation
 for i=2:ny-1
     for j=1:nx
- mu(i,j)=4*bita*phi(i,j)*(phi(i,j)-0.5)*(phi(i,j)-1)-kappa*L_phi(i,j)-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*(E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j));
-    end
-end
-% %calculation of Fs
-for i=2:ny-1
-    for j=1:nx
-            Fs_x(i,j)=mu(i,j)*g_phix(i,j);
-            Fs_y(i,j)=mu(i,j)*g_phiy(i,j);
+ mu(i,j)=4*bita*phi(i,j)*(phi(i,j)-1)*(phi(i,j)+1)-kappa*L_phi(i,j);
     end
 end
 
@@ -544,13 +470,13 @@ end
 
 
 %calculation of Fs
-% for i=2:ny-1
-%     for j=1:nx
-% 
-%             Fs_x(i,j)=mu(i,j)*g_phix(i,j);
-%             Fs_y(i,j)=mu(i,j)*g_phiy(i,j);
-%     end
-% end
+for i=2:ny-1
+    for j=1:nx
+
+            Fs_x(i,j)=mu(i,j)*g_phix(i,j);
+            Fs_y(i,j)=mu(i,j)*g_phiy(i,j);
+    end
+end
 %%%%%%%%%%%%%%%%%%%%% ELECTRIC SOLVER  STARTS
 
 % %%%% implementing the equation of electric
@@ -562,11 +488,11 @@ end
      fprintf('L= %d\n', L);
  for i=1:ny
     for j=1:nx
-        for k=1:9
+        for k=1:5
            if k==1
-                h_eq(i,j,k)=(wt(k)-1)*phi_e(i,j);
+                h_eq(i,j,k)=(wwt(k)-1)*phi_e(i,j);
             else
-                h_eq(i,j,k)=wt(k)*phi_e(i,j);   
+                h_eq(i,j,k)=wwt(k)*phi_e(i,j);   
            end
         end
      end
@@ -575,7 +501,7 @@ end
 
 for i=1:ny
     for j=1:nx
-        for k=1:9
+        for k=1:5
           tau_h=0.5+3*sigma(i,j);                                   %%%% leaky dielectric model
           ht(i,j,k)=-((h(i,j,k)-h_eq(i,j,k))/tau_h)+h(i,j,k);
         end
@@ -588,7 +514,7 @@ end
 % 
 for i=2:ny-1
     for j=1:nx
-       for k=1:9
+       for k=1:5
         ia=i+ey(k);
         ja=j+ex(k);
 
@@ -609,20 +535,12 @@ end
 for j=1:nx
 for i=2
 
-         % h(i,j,3)=-ht(1,j,5);
-
          h(i,j,3)=-ht(1,j,5);
 
-         h(i,j,6)=-ht(1,j,8);
-
-         h(i,j,7)=-ht(1,j,9);
 end
 for i=ny-1
 
-        % h(i,j,5)=-ht(ny,j,3)+2*wwt(3)*28.2;   
-        h(i,j,5)=-ht(ny,j,3)+2*wt(3)*28.2;     
-        h(i,j,8)=-ht(ny,j,6)+2*wt(6)*28.2;
-        h(i,j,9)=-ht(ny,j,7)+2*wt(7)*28.2;
+        h(i,j,5)=-ht(ny,j,3)+2*wwt(3)*28.2;     
 
 end
 end
@@ -634,8 +552,8 @@ end
 for i=2:ny-1
     for j=1:nx
         phi_e(i,j)=0;
-        for k=2:9
-            phi_e(i,j)=phi_e(i,j)+1.8*h(i,j,k);
+        for k=2:5
+            phi_e(i,j)=phi_e(i,j)+1.5*h(i,j,k);
 
         end
 
@@ -677,16 +595,16 @@ for i =2:ny-1
     for j =1:nx
         dx=0;
         dy=0;
-        for k=2:9
-            ia=i+ey(k);
-            ja=j+ex(k);
+        for k=2:5
+            ia=i+eyy(k);
+            ja=j+exx(k);
             if ja>nx
                 ja=1;
             elseif ja<1
                 ja=nx;
             end
-            dx=dx+ex(k)*wt(k)*phi_e(ia,ja);
-            dy=dy+ey(k)*wt(k)*phi_e(ia,ja);
+            dx=dx+exx(k)*wwt(k)*phi_e(ia,ja);
+            dy=dy+eyy(k)*wwt(k)*phi_e(ia,ja);
 
         end
         E_x(i,j)=-3*dx;
@@ -710,17 +628,17 @@ for i=2:ny-1
     for j=1:nx
         tempx=0;
         tempy=0;
-         for k=2:9
-             ia=i+ey(k);
-             ja=j+ex(k);
+         for k=2:5
+             ia=i+eyy(k);
+             ja=j+exx(k);
 
             if ja>nx
               ja=1;
             elseif ja<1
               ja=nx;
             end
-             tempx= tempx+ex(k)*wt(k)*phi_e(ia,ja);
-             tempy=tempy+ey(k)*wt(k)*phi_e(ia,ja);
+             tempx= tempx+exx(k)*wwt(k)*phi_e(ia,ja);
+             tempy=tempy+eyy(k)*wwt(k)*phi_e(ia,ja);
          end
 gradphi_ex(i,j)=tempx*3;
 gradphi_ey(i,j)=tempy*3;
@@ -731,9 +649,9 @@ end
 for i=2:ny-1
     for j=1:nx
         div=0;
-        for k=2:9
-            ia=i+ey(k);
-            ja=j+ex(k);
+        for k=2:5
+            ia=i+eyy(k);
+            ja=j+exx(k);
             if ja > nx
                 ja=1;
             elseif ja < 1
@@ -741,7 +659,7 @@ for i=2:ny-1
             end
             % central difference approximation for divergence
             % div=div+wt(k)*(epsi(ia,ja)*(phi_e(ia,ja)-phi_e(i,j)));     %%%changes 1       
-            div=div+wt(k)*(phi_e(ia,ja)-phi_e(i,j));
+            div=div+wwt(k)*(phi_e(ia,ja)-phi_e(i,j));
 
         end
         rho_e(i,j)=-((6*epsi(i,j)*div+0.5*(epsi_H-epsi_L)*(gradphi_ex(i,j)*g_phix(i,j)+gradphi_ey(i,j)*g_phiy(i,j)))); % factor depends on your stencil (3*2)
@@ -944,8 +862,8 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Uncomment it for observing the droplet
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%
+% 
 % figure(302); clf; set(gcf,'Color','w');
 % 
 % imagesc([1 size(X,2)], [1 size(Y,1)], phi);
@@ -962,16 +880,16 @@ end
 % contour(X, Y, phi, [0 0], 'w', 'LineWidth', 1.2);
 % 
 % drawnow;
+% 
 
 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
+
+
+
+
+
+
+
 end
 
 
