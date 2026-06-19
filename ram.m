@@ -572,6 +572,7 @@ end
         % pause(0.1)
      fprintf('le = %d\n', le);
      fprintf('L= %d\n', L);
+     
  for i=1:ny
     for j=1:nx
         for k=1:9
@@ -582,54 +583,46 @@ end
            end
         end
      end
- end
-% % %%%% calculation of gradient of electric potential
-for i=2:ny-1
-    for j=1:nx
-        gradphi_eex(i,j)=0;
-        gradphi_eey(i,j)=0;
-        for k=1:9
-            tau_h=0.5+3*epsi_L;
-            epsi_unit(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+tau_h/3;
-            gradphi_eex(i,j)= gradphi_eex(i,j)+(ex(k)*h(i,j,k));
-            gradphi_eey(i,j)= gradphi_eey(i,j)+(ey(k)*h(i,j,k)); 
-        end
-        gradphi_eex(i,j)= -gradphi_eex(i,j)/epsi_unit(i,j);
-        gradphi_eey(i,j)= -gradphi_eey(i,j)/epsi_unit(i,j);
-    end
 end
+% %% calculation of distribution function for electric potential
 
-% % %% calculation of distribution function for electric potential
 for i=1:ny
     for j=1:nx
         for k=1:9
-          tau_h=0.5+3*epsi_L;      %%%% leaky dielectric model
-          ht(i,j,k)=-((h(i,j,k)-h_eq(i,j,k))/tau_h)+h(i,j,k)-3*(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)*wt(k)*(1/tau_h)*(ex(k)*gradphi_eex(i,j)+ey(k)*gradphi_eey(i,j))+wwt(k)*q(i,j);
+          tau_h=0.5+3*sigma(i,j);                                   %%%% leaky dielectric model
+          ht(i,j,k)=-((h(i,j,k)-h_eq(i,j,k))/tau_h)+h(i,j,k);
         end
     end
 end
 
-% % % %%% streaming of electric potential
-% % % 
-% % % % streaming of post collision particle distribution
-% % % 
+% %%% streaming of electric potential
+% 
+% % streaming of post collision particle distribution
+% 
 for i=2:ny-1
     for j=1:nx
        for k=1:9
         ia=i+ey(k);
         ja=j+ex(k);
+
         if ja>nx
           ja=1;
         elseif ja<1
           ja=nx;
         end
            h(ia,ja,k)=ht(i,j,k);  
+
         end  
     end
 end 
-% % % % Boundary condition
+
+
+% % Boundary condition
+
 for j=1:nx
-for  i=2
+for i=2
+
+         % h(i,j,3)=-ht(1,j,5);
 
          h(i,j,3)=-ht(1,j,5);
 
@@ -637,24 +630,28 @@ for  i=2
 
          h(i,j,7)=-ht(1,j,9);
 end
+for i=ny-1
 
-   for i=ny-1
+        % h(i,j,5)=-ht(ny,j,3)+2*wwt(3)*28.2;   
         h(i,j,5)=-ht(ny,j,3)+2*wt(3)*28.2;     
         h(i,j,8)=-ht(ny,j,6)+2*wt(6)*28.2;
         h(i,j,9)=-ht(ny,j,7)+2*wt(7)*28.2;
 
+end
+end
 
-   end
- end
 
-% % % %%% convergence criteria for electric potential
-% % % % calculation of phi_e
+
+% %%% convergence criteria for electric potential
+% % calculation of phi_e
 for i=2:ny-1
     for j=1:nx
         phi_e(i,j)=0;
         for k=2:9
             phi_e(i,j)=phi_e(i,j)+1.8*h(i,j,k);
+
         end
+
     end
 end
 for i=1:ny
@@ -662,28 +659,31 @@ for i=1:ny
 phi_enew(i,j) = phi_e(i,j);
     end
 end
-% % % % --- Compute error using loops ---
+
+% % --- Compute error using loops ---
     numerator=0;
     denominator=0;
     for i=1:ny
         for j=1:nx
-            numerator=numerator+(phi_enew(i,j)-phi_eold(i,j))^2;
-            denominator=denominator+(phi_enew(i,j))^2;
+            numerator=numerator+abs(phi_enew(i,j)-phi_eold(i,j));
+            denominator=denominator+abs(phi_enew(i,j));
         end
     end
 
     L=numerator/(denominator);
-    L=sqrt(L);
      for    i=2:ny-1
         for j = 1:nx
           phi_eold(i,j) = phi_enew(i,j);
         end
      end
+
+
     end 
   end
 
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
- L=1;
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+          L=1;
 % % %   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%         
 % % % %%%%%%Compute E_x and E_y (Electric field):%%%%%%%%%%%%%%%%%%
 
