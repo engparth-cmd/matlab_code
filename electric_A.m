@@ -141,6 +141,28 @@ end
 % end
 % end
 % end
+%%%%%%Compute E_x and E_y (Electric field):%%%%%%%%%%%%%%%%%%
+
+for i =2:ny-1
+    for j =1:nx
+        dx=0;
+        dy=0;
+        for k=2:9
+            ia=i+ey(k);
+            ja=j+ex(k);
+            if ja>nx
+                ja=1;
+            elseif ja<1
+                ja=nx;
+            end
+            dx=dx+ex(k)*wt(k)*phi_e(ia,ja);
+            dy=dy+ey(k)*wt(k)*phi_e(ia,ja);
+
+        end
+        E_x(i,j)=-3*dx;
+        E_y(i,j)=-3*dy;
+    end
+end
 %%% defining the gradient phi and laplace phi
 
 for i=2:ny-1
