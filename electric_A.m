@@ -141,6 +141,57 @@ end
 % end
 % end
 % end
+%%% defining the gradient phi and laplace phi
+
+for i=2:ny-1
+    for j=1:nx
+        tempx=0;
+        tempy=0;
+         for k=2:9 
+             ia=i+ey(k);
+             ja=j+ex(k);
+
+            if ja>nx
+              ja=1;
+            elseif ja<1
+              ja=nx;
+            end
+             tempx= tempx+ex(k)*wt(k)*phi(ia,ja);
+             tempy=tempy+ey(k)*wt(k)*phi(ia,ja);
+         end
+g_phix(i,j)=tempx*3;
+g_phiy(i,j)=tempy*3;
+
+    end
+end
+% % calculation of normal
+
+for i=2:ny-1
+    for j=1:nx
+
+           z(i,j)=sqrt(g_phix(i,j)^2+g_phiy(i,j)^2)+0.00000000001;
+
+    end
+end
+% % % % calculation of laplace phi
+for i=2:ny-1
+    for j=1:nx
+        tempx1=0;
+         for k=2:9 
+             ia=i+ey(k);
+             ja=j+ex(k);
+
+            if ja>nx
+              ja=1;
+            elseif ja<1
+              ja=nx;
+            end
+             tempx1= tempx1 + wt(k)*(phi(ia,ja)-phi(i,j));
+
+         end
+L_phi(i,j)=tempx1*6;
+    end
+end
 %% STEP 2 %%%%%%%% initialization  for phase field  distribution function
 for i=1:ny
 for j=1:nx
