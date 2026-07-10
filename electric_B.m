@@ -141,7 +141,8 @@ end
 % phi(ny,j)=phi(ny-1,j) ;
 % mu(1,j) = mu(2,j);
 % mu(ny,j)= mu(ny-1,j);
-% q(2,j)=0;
+% q(2,j)=0.001;
+% q(ny,j)= q(ny-1,j);
 % end
 % % 
 % %% initial value for wetting boundary condition
@@ -244,6 +245,7 @@ for i=1:ny
         end
      end
 end
+
 % %% initialization  for Nernst planck distribution function
 for i=1:ny
     for j=1:nx
