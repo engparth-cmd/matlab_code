@@ -134,18 +134,16 @@ for j=1:nx
  phi(i,j)=0.5+0.5*tanh(2*(R1-sqrt((j-141)^2+(i-141)^2))/W);
 end
 end
-% 
-% % %%%%%%
-% for j=1:nx   
+%%%%%%%
+for j=1:nx   
 % phi(1,j)=phi(2,j) ; 
 % phi(ny,j)=phi(ny-1,j) ;
 % mu(1,j) = mu(2,j);
 % mu(ny,j)= mu(ny-1,j);
-% q(2,j)=0.001;
-% q(ny,j)= q(ny-1,j);
-% end
-% % 
-% %% initial value for wetting boundary condition
+ q(2,j)=0.001;
+ q(ny,j)= q(ny-1,j); 
+end
+%%% initial value for wetting boundary condition
 for i=1
 for j=1:nx   
   tita(i,j)=cos(theta)+0.5*(epsi_S*phi_e(i,j)*phi_e(i,j))/(sig*th);
