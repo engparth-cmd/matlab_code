@@ -609,7 +609,7 @@ end
      end
  end
 % % %%%% calculation of gradient of electric potential
-for i=2:ny-1
+for i=1:ny
     for j=1:nx
         gradphi_eex(i,j)=0;
         gradphi_eey(i,j)=0;
@@ -712,7 +712,7 @@ end
 % % %   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%         
 % % % %%%%%%Compute E_x and E_y (Electric field):%%%%%%%%%%%%%%%%%%
 
-for i =2:ny-1
+for i =1:ny
     for j =1:nx
         E_x(i,j)=-gradphi_eex(i,j);
         E_y(i,j)=-gradphi_eey(i,j);
@@ -720,7 +720,7 @@ for i =2:ny-1
 end
 % % % % % %%%%%%%%%%%%%%%%%%%%%% Compute E^2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % % % 
-for i = 2:ny-1
+for i = 1:ny
     for j =1:nx
    E2(i,j)=E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j);
     end
