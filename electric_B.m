@@ -250,7 +250,7 @@ for i =1:ny
 end
 
 %%%% defining electric potential
-for i = 2:ny-1
+for i = 1:ny
     for j = 1:nx
    E2(i,j)=E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j);
     end
