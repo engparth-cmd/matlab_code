@@ -228,7 +228,7 @@ for i=1:ny
 end
 %%%%%%Compute E_x and E_y (Electric field):%%%%%%%%%%%%%%%%%%
 % % %%%% calculation of gradient of electric potential
-for i=2:ny-1
+for i=1:ny
     for j=1:nx
         gradphi_eex(i,j)=0;
         gradphi_eey(i,j)=0;
@@ -242,7 +242,7 @@ for i=2:ny-1
         gradphi_eey(i,j)= -gradphi_eey(i,j)/epsi_unit(i,j);
     end
 end
-for i =2:ny-1
+for i =1:ny
     for j =1:nx
         E_x(i,j)=-gradphi_eex(i,j);
         E_y(i,j)=-gradphi_eey(i,j);
