@@ -226,7 +226,6 @@ for i=1:ny
         end
      end
 end
-%%%%%%Compute E_x and E_y (Electric field):%%%%%%%%%%%%%%%%%%
 % % %%%% calculation of gradient of electric potential
 for i=2:ny-1
     for j=1:nx
