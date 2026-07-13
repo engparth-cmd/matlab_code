@@ -728,19 +728,19 @@ end
 % % %%%%%%%%%%%% calculation of  Nernst-Planck equation %%%%%%%%%%%%%%%5
 % % 
 % %%%%%% calculation of forcing term R %%%%%%%%%%%%%%%%%%%%
-for i= 3:ny-1
+for i= 2:ny-1
     for j= 1:nx
 R(i,j)=(-sigma(i,j)*q(i,j)/epsi(i,j))+(sigma(i,j)/epsi(i,j))*(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(epsi_L-epsi_H)*(phi(i,j)-1)*phi(i,j)*6-(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(sigma_H-sigma_L);
     end
 end
-for i = 3:ny-1
+for i = 2:ny-1
     for j =1:nx
         dQu_x(i,j) = (q_new(i,j)*ux_new(i,j)-q_old(i,j)*ux_old(i,j));
         dQu_y(i,j) = (q_new(i,j)*uy_new(i,j)-q_old(i,j)*uy_old(i,j));
     end
 end
 % % %%%%%% calculation of Si and Ti %%%%%%%%%%%%%%%%%%%%%
-for i= 3:ny-1
+for i= 2:ny-1
     for j= 1:nx
         for k=1:9
             tau_l=0.5+3*elpha;
@@ -749,7 +749,7 @@ for i= 3:ny-1
         end
     end
 end
- for i=3:ny-1
+ for i=2:ny-1
     for j=1:nx
         for k=1:9
                 l_eq(i,j,k)=wt(k)*q(i,j)*(1+3*(ex(k)*ux(i,j)+ey(k)*uy(i,j)));
@@ -761,7 +761,7 @@ end
 % % % 
 % % % streaming of post collision particle distribution
 % % 
-for i=3:ny-1
+for i=2:ny-1
     for j=1:nx
        for k=1:9
         ia=i+ey(k);
@@ -777,7 +777,7 @@ for i=3:ny-1
 end 
 % % % Boundary condition
 for j=1:nx
-    i=3;
+    i=2;
          l(i,j,3)=lt(1,j,5);
          l(i,j,6)=lt(1,j,8);
          l(i,j,7)=lt(1,j,9);
@@ -788,7 +788,7 @@ for j=1:nx
         l(i,j,8)=lt(ny,j,6);
         l(i,j,9)=lt(ny,j,7);
 end
-for i=3:ny-1
+for i=2:ny-1
     for j=1:nx
         q(i,j)=0;
         for k=1:9
