@@ -672,13 +672,9 @@ end
 % 
 for i = 2:ny-1
     for j = 1:nx
-        FE_x(i,j)=-0.5*0.5*(epsi_H-epsi_L)*g_phix(i,j)*E2(i,j)+rho_e(i,j)*E_x(i,j);
-        FE_y(i,j)=-0.5*0.5*(epsi_H-epsi_L)*g_phiy(i,j)*E2(i,j)+rho_e(i,j)*E_y(i,j);
-       FE1(i,j)=-0.5*0.5*(epsi_H-epsi_L)*g_phix(i,j)*E2(i,j);
-       FE2(i,j)=-0.5*0.5*(epsi_H-epsi_L)*g_phiy(i,j)*E2(i,j);
-       FE3(i,j)=rho_e(i,j)*E_x(i,j);     
-       FE4(i,j)=rho_e(i,j)*E_y(i,j); 
-
+        FE_x(i,j)=-0.5*0.5*(epsi_H-epsi_L)*g_phix(i,j)*E2(i,j);
+        FE_y(i,j)=-0.5*0.5*(epsi_H-epsi_L)*g_phiy(i,j)*E2(i,j);
+        
     end
 end
 
