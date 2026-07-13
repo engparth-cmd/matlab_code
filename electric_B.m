@@ -136,12 +136,12 @@ end
 end
 %%%%%%%
 for j=1:nx   
-% phi(1,j)=phi(2,j) ; 
-% phi(ny,j)=phi(ny-1,j) ;
-% mu(1,j) = mu(2,j);
-% mu(ny,j)= mu(ny-1,j);
- q(2,j)=0.001;
- q(ny,j)= q(ny-1,j); 
+phi(1,j)=phi(2,j) ; 
+phi(ny,j)=phi(ny-1,j) ;
+mu(1,j) = mu(2,j);
+mu(ny,j)= mu(ny-1,j);
+%  q(2,j)=0.001;
+%  q(ny,j)= q(ny-1,j); 
 end
 %%% initial value for wetting boundary condition
 for i=1
@@ -977,7 +977,7 @@ load('results.mat');
 % caxis([0 1])
 % title(sprintf('Phase field \\phi at step = %d', step))
 % drawnow
-
+% 
 % to check the droplet profile 
 % figure(1); clf
 % 

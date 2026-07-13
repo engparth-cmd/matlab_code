@@ -1019,22 +1019,22 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Uncomment it for observing the droplet
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%
 
-% figure(302); clf; set(gcf,'Color','w');
-% 
-% imagesc([1 size(X,2)], [1 size(Y,1)], phi);
-% axis image tight;
-% set(gca,'YDir','normal');           % origin at bottom-left
-% colormap('jet'); colorbar;
-% 
-% xlabel('x'); ylabel('y');
-% title(sprintf('Phase field  \\phi  (step %d)', step), ...
-%       'Interpreter','tex','FontSize',12);               
-% 
-% Optional: emphasize droplet interface (φ=0 contour)
-% hold on;
-% contour(X, Y, phi, [0 0], 'w', 'LineWidth', 1.2);
-% 
-% drawnow;
+figure(302); clf; set(gcf,'Color','w');
+
+imagesc([1 size(X,2)], [1 size(Y,1)], phi);
+axis image tight;
+set(gca,'YDir','normal');           % origin at bottom-left
+colormap('jet'); colorbar;
+
+xlabel('x'); ylabel('y');
+title(sprintf('Phase field  \\phi  (step %d)', step), ...
+      'Interpreter','tex','FontSize',12);               
+
+Optional: emphasize droplet interface (φ=0 contour)
+hold on;
+contour(X, Y, phi, [0 0], 'w', 'LineWidth', 1.2);
+
+drawnow;
 
 
 % 
