@@ -392,8 +392,8 @@ end
 for i = 2:ny-1
     for j =1:nx
         phi_old(i,j)=phi(i,j);
-        ux_old(i,j)=ux(i,j);
-        uy_old(i,j)=uy(i,j);
+        % ux_old(i,j)=ux(i,j);
+        % uy_old(i,j)=uy(i,j);
     end
 end
 % %%% defining the gradient phi and laplace phi
@@ -755,6 +755,11 @@ end
 %         dQu_y(i,j) = (q_new(i,j)*uy_new(i,j)-q_old(i,j)*uy_old(i,j));
 %     end
 % end
+ for i = 2:ny-1
+    for j =1:nx
+        q_old(i,j) =q(i,j);
+    end
+end
 % % % %%%%%% calculation of Si and Ti %%%%%%%%%%%%%%%%%%%%%
 % for i= 2:ny-1
 %     for j= 1:nx
@@ -839,7 +844,13 @@ for i = 2:ny-1
      Fyy(i,j)=Fs_y(i,j);
     end
 end
-
+for i = 2:ny-1
+    for j =1:nx
+        
+        ux_old(i,j)=ux(i,j);
+        uy_old(i,j)=uy(i,j);
+    end
+end
 
 
 %%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -963,6 +974,7 @@ for i=2:ny-1
      ux_new(i,j) =ux(i,j);
      uy_new(i,j) =uy(i,j);
      phi_now(i,j) = phi(i,j);
+     q_new(i,j) =q(i,j);
    end 
 end
 % %  %% Every 1000 steps, check convergence
