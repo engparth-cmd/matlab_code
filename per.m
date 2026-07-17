@@ -30,8 +30,6 @@ Fs_x=zeros(ny,nx);
 Fs_y=zeros(ny,nx);
 FE_x=zeros(ny,nx);
 FE_y=zeros(ny,nx);
-FD_x=zeros(ny,nx); % Diffusion force
-FD_y=zeros(ny,nx); % Diffusion force
 FE1=zeros(ny,nx);
 FE2=zeros(ny,nx);
 FE3=zeros(ny,nx);
@@ -51,9 +49,8 @@ l_eq=zeros(ny,nx,9);
 dQu_x=zeros(ny,nx);               %%%%% ADD_1
 dQu_y=zeros(ny,nx);               %%%%% ADD_2
 q_old=zeros(ny,nx);               %%%%% ADD_3
-q_new=zeros(ny,nx);              %%%%% ADD_4
-di=zeros(ny,nx);                   % for calculating diffusion force term
-elpha=0.1;                        %%%%% ADD_5 % charge diffusion coefficient
+q_new=zeros(ny,nx);               %%%%% ADD_4
+elpha=0.0001;                        %%%%% ADD_5 % charge diffusion coefficient
 ux_old=zeros(ny,nx);
 uy_old=zeros(ny,nx);
 ux_new=zeros(ny,nx);
@@ -374,7 +371,7 @@ end
 
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%loop starts from here
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for st=1:100000
+for st=1:10000000000
     fprintf('st = %d\n', st);
     % pause(0.2)
 if (error > 0.0000001)
@@ -631,8 +628,8 @@ end
 for i=1:ny
     for j=1:nx
         for k=1:9
-          %tau_h=0.5+3*epsi_L;      %%%% leaky dielectric model
-          tau_h=0.5+3*sigma(i,j); 
+          tau_h=0.5+3*epsi_L;      %%%% leaky dielectric model
+          % tau_h=0.5+3*sigma(i,j); 
           ht(i,j,k)=-((h(i,j,k)-h_eq(i,j,k))/tau_h)+h(i,j,k)-3*(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)*wt(k)*(1/tau_h)*(ex(k)*gradphi_eex(i,j)+ey(k)*gradphi_eey(i,j))+wwt(k)*q(i,j);
         end
     end
@@ -729,133 +726,122 @@ for i = 1:ny
    E2(i,j)=E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j);
     end
 end
-% % %%%%%%%%%%%% calculation of  Nernst-Planck equation %%%%%%%%%%%%%%%5
-% % 
-% %%%%%% calculation of forcing term R %%%%%%%%%%%%%%%%%%%%
-for i= 2:ny-1
-    for j= 1:nx
-R(i,j)=(-sigma(i,j)*q(i,j)/epsi(i,j))+(sigma(i,j)/epsi(i,j))*(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(epsi_L-epsi_H)*(phi(i,j)-1)*phi(i,j)*6-(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(sigma_H-sigma_L);
-    end
-end
-for i = 2:ny-1
-    for j =1:nx
-        dQu_x(i,j) = (q_new(i,j)*ux_new(i,j)-q_old(i,j)*ux_old(i,j));
-        dQu_y(i,j) = (q_new(i,j)*uy_new(i,j)-q_old(i,j)*uy_old(i,j));
-    end
-end
 
-for i = 2:ny-1
-    for j =1:nx
-        q_old(i,j) =q(i,j);
-    end
-end
-% % %%%%%% calculation of Si and Ti %%%%%%%%%%%%%%%%%%%%%
-for i= 2:ny-1
-    for j= 1:nx
-        for k=1:9
-            tau_l=0.5+3*elpha;
-            S(i,j,k)=(1-0.5/tau_l)*wt(k)*R(i,j);
-            T(i,j,k)=3*(1-0.5/tau_l)*wt(k)*(ex(k)*dQu_x(i,j)+ey(k)*dQu_y(i,j));
-        end
-    end
-end
- for i=2:ny-1
-    for j=1:nx
-        for k=1:9
-                l_eq(i,j,k)=wt(k)*q(i,j)*(1+3*(ex(k)*ux(i,j)+ey(k)*uy(i,j)));
-                lt(i,j,k)=-(((l(i,j,k)-l_eq(i,j,k)))/tau_l)+l(i,j,k)+S(i,j,k)+T(i,j,k);
-        end
-     end
- end
-% % % %%% streaming of NERNST PLANCK EQUATION
+% %%%%%%%%%%%%%%%%%%%%% for dielectric model %%%%%%%%%%%%%%%%%%%%%%
+
+% 
+% %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
+% 
+% 
+% for i = 2:ny-1
+%     for j = 1:nx
+%         FE_x(i,j)=-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*g_phix(i,j)*E2(i,j);
+%         FE_y(i,j)=-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*g_phiy(i,j)*E2(i,j);
+% 
+%     end
+% end
+
+% % % %%%%%%%%%%%% calculation of  Nernst-Planck equation %%%%%%%%%%%%%%%5
 % % % 
-% % % streaming of post collision particle distribution
-% % 
-for i=2:ny-1
-    for j=1:nx
-       for k=1:9
-        ia=i+ey(k);
-        ja=j+ex(k);
-        if ja>nx
-          ja=1;
-        elseif ja<1
-          ja=nx;
-        end
-        l(ia,ja,k)=lt(i,j,k);  
-        end  
-    end
-end 
-% % % Boundary condition
-for j=1:nx
-    i=2;
-         l(i,j,3)=lt(1,j,5);
-         l(i,j,6)=lt(1,j,8);
-         l(i,j,7)=lt(1,j,9);
-end
-for j=1:nx
-    i=ny-1;
-        l(i,j,5)=lt(ny,j,3);     
-        l(i,j,8)=lt(ny,j,6);
-        l(i,j,9)=lt(ny,j,7);
-end
-for i=2:ny-1
-    for j=1:nx
-        q(i,j)=0;
-        for k=1:9
-            q(i,j)=q(i,j)+l(i,j,k);
-        end
-          q(i,j)=q(i,j)+0.5*R(i,j);
-    end
-end
-% % % % %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
-
-for i = 2:ny-1
-    for j = 1:nx
-        FE_x(i,j)=q(i,j)*E_x(i,j);
-        FE_y(i,j)=q(i,j)*E_y(i,j);
-
-    end
-end
-
-%%% calculation of diffusion force
-
-for i = 2:ny-1
-    for j = 1:nx
-di(i,j) = (elpha/sigma(i,j))*q(i,j)*q(i,j);
-    end
-end
-
-% %%% defining the gradient of diffusion force
-for i=2:ny-1
-    for j=1:nx
-        tempx=0;
-        tempy=0;
-         for k=2:9 
-             ia=i+ey(k);
-             ja=j+ex(k);
-            if ja>nx
-              ja=1;
-            elseif ja<1
-              ja=nx;
-            end
-             tempx= tempx+ex(k)*wt(k)*di(ia,ja);
-             tempy=tempy+ey(k)*wt(k)*di(ia,ja);
-         end
-FD_x(i,j)=-0.5*tempx*3;
-FD_y(i,j)=-0.5*tempy*3;
-    end
-end
-
+% % %%%%%% calculation of forcing term R %%%%%%%%%%%%%%%%%%%%
+% for i= 2:ny-1
+%     for j= 1:nx
+% R(i,j)=(-sigma(i,j)*q(i,j)/epsi(i,j))+(sigma(i,j)/epsi(i,j))*(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(epsi_L-epsi_H)*(phi(i,j)-1)*phi(i,j)*6-(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(sigma_H-sigma_L);
+%     end
+% end
+% for i = 2:ny-1
+%     for j =1:nx
+%         dQu_x(i,j) = (q_new(i,j)*ux_new(i,j)-q_old(i,j)*ux_old(i,j));
+%         dQu_y(i,j) = (q_new(i,j)*uy_new(i,j)-q_old(i,j)*uy_old(i,j));
+%     end
+% end
+% % % %%%%%% calculation of Si and Ti %%%%%%%%%%%%%%%%%%%%%
+% for i= 2:ny-1
+%     for j= 1:nx
+%         for k=1:9
+%             tau_l=0.5+3*elpha;
+%             S(i,j,k)=(1-0.5/tau_l)*wt(k)*R(i,j);
+%             T(i,j,k)=3*(1-0.5/tau_l)*wt(k)*(ex(k)*dQu_x(i,j)+ey(k)*dQu_y(i,j));
+%         end
+%     end
+% end
+%  for i=2:ny-1
+%     for j=1:nx
+%         for k=1:9
+%                 l_eq(i,j,k)=wt(k)*q(i,j)*(1+3*(ex(k)*ux(i,j)+ey(k)*uy(i,j)));
+%                 lt(i,j,k)=-(((l(i,j,k)-l_eq(i,j,k)))/tau_l)+l(i,j,k)+S(i,j,k)+T(i,j,k);
+%         end
+%      end
+%  end
+% % % % %%% streaming of NERNST PLANCK EQUATION
+% % % % 
+% % % % streaming of post collision particle distribution
+% % % 
+% for i=2:ny-1
+%     for j=1:nx
+%        for k=1:9
+%         ia=i+ey(k);
+%         ja=j+ex(k);
+%         if ja>nx
+%           ja=1;
+%         elseif ja<1
+%           ja=nx;
+%         end
+%         l(ia,ja,k)=lt(i,j,k);  
+%         end  
+%     end
+% end 
+% % % % Boundary condition
+% for j=1:nx
+%     i=2;
+%          l(i,j,3)=lt(1,j,5);
+%          l(i,j,6)=lt(1,j,8);
+%          l(i,j,7)=lt(1,j,9);
+% end
+% for j=1:nx
+%     i=ny-1;
+%         l(i,j,5)=lt(ny,j,3);     
+%         l(i,j,8)=lt(ny,j,6);
+%         l(i,j,9)=lt(ny,j,7);
+% end
+% for i=2:ny-1
+%     for j=1:nx
+%         q(i,j)=0;
+%         for k=1:9
+%             q(i,j)=q(i,j)+l(i,j,k);
+%         end
+%           q(i,j)=q(i,j)+0.5*R(i,j);
+%     end
+% end
+% % % % % %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
+% 
+% for i = 2:ny-1
+%     for j = 1:nx
+%         FE_x(i,j)=q(i,j)*E_x(i,j);
+%         FE_y(i,j)=q(i,j)*E_y(i,j);
+% 
+%     end
+% end
 % 
 % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%ELECTRIC SOLVER ENDS
 % % % % %%%%%%%%%%%%%%%%%%%%%%%%% calculation of force %%%%%%%%%%%%%
 % 
+% for i = 2:ny-1
+%     for j = 1:nx
+%      Fxx(i,j)=Fs_x(i,j)+FE_x(i,j);
+%      Fyy(i,j)=Fs_y(i,j)+FE_y(i,j);
+%     end
+% end
+
 for i = 2:ny-1
     for j = 1:nx
-     Fxx(i,j)=Fs_x(i,j)+FE_x(i,j)+FD_x(i,j);
-     Fyy(i,j)=Fs_y(i,j)+FE_y(i,j)+FD_y(i,j);
+     Fxx(i,j)=Fs_x(i,j);
+     Fyy(i,j)=Fs_y(i,j);
     end
 end
+
+
+
 %%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % % %%%%%%%%%%%%%%%%%%% calculation of Ri %%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -977,7 +963,6 @@ for i=2:ny-1
      ux_new(i,j) =ux(i,j);
      uy_new(i,j) =uy(i,j);
      phi_now(i,j) = phi(i,j);
-     q_new(i,j) =q(i,j);
    end 
 end
 % %  %% Every 1000 steps, check convergence
