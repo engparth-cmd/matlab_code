@@ -53,7 +53,7 @@ dQu_y=zeros(ny,nx);               %%%%% ADD_2
 q_old=zeros(ny,nx);               %%%%% ADD_3
 q_new=zeros(ny,nx);              %%%%% ADD_4
 di=zeros(ny,nx);                   % for calculating diffusion force term
-elpha=0.0001;                        %%%%% ADD_5 % charge diffusion coefficient
+elpha=0.1;                        %%%%% ADD_5 % charge diffusion coefficient
 ux_old=zeros(ny,nx);
 uy_old=zeros(ny,nx);
 ux_new=zeros(ny,nx);
@@ -374,7 +374,7 @@ end
 
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%loop starts from here
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for st=1:10000000000
+for st=1:100000
     fprintf('st = %d\n', st);
     % pause(0.2)
 if (error > 0.0000001)
@@ -395,8 +395,8 @@ end
 for i = 2:ny-1
     for j =1:nx
         phi_old(i,j)=phi(i,j);
-        ux_old(i,j)=ux(i,j);
-        uy_old(i,j)=uy(i,j);
+        % ux_old(i,j)=ux(i,j);
+        % uy_old(i,j)=uy(i,j);
     end
 end
 % %%% defining the gradient phi and laplace phi
@@ -841,8 +841,8 @@ for i=2:ny-1
              tempx= tempx+ex(k)*wt(k)*di(ia,ja);
              tempy=tempy+ey(k)*wt(k)*di(ia,ja);
          end
-FD_x(i,j)=tempx*3;
-FD_y(i,j)=tempy*3;
+FD_x(i,j)=-0.5*tempx*3;
+FD_y(i,j)=-0.5*tempy*3;
     end
 end
 
@@ -853,9 +853,17 @@ end
 for i = 2:ny-1
     for j = 1:nx
      Fxx(i,j)=Fs_x(i,j)+FE_x(i,j)+FD_x(i,j);
-     Fyy(i,j)=Fs_y(i,j)+FE_y(i,j)+FD_y(i,);
+     Fyy(i,j)=Fs_y(i,j)+FE_y(i,j)+FD_y(i,j);
     end
 end
+%%% update the velocity
+for i = 2:ny-1
+    for j =1:nx
+        ux_old(i,j)=ux(i,j);
+        uy_old(i,j)=uy(i,j);
+    end
+end
+
 %%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % % %%%%%%%%%%%%%%%%%%% calculation of Ri %%%%%%%%%%%%%%%%%%%%%%%%
 

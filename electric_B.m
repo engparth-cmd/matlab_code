@@ -395,8 +395,8 @@ end
 for i = 2:ny-1
     for j =1:nx
         phi_old(i,j)=phi(i,j);
-        ux_old(i,j)=ux(i,j);
-        uy_old(i,j)=uy(i,j);
+        % ux_old(i,j)=ux(i,j);
+        % uy_old(i,j)=uy(i,j);
     end
 end
 % %%% defining the gradient phi and laplace phi
@@ -856,6 +856,14 @@ for i = 2:ny-1
      Fyy(i,j)=Fs_y(i,j)+FE_y(i,j)+FD_y(i,j);
     end
 end
+%%% update the velocity
+for i = 2:ny-1
+    for j =1:nx
+        ux_old(i,j)=ux(i,j);
+        uy_old(i,j)=uy(i,j);
+    end
+end
+
 %%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % % %%%%%%%%%%%%%%%%%%% calculation of Ri %%%%%%%%%%%%%%%%%%%%%%%%
 
