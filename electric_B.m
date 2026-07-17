@@ -30,6 +30,8 @@ Fs_x=zeros(ny,nx);
 Fs_y=zeros(ny,nx);
 FE_x=zeros(ny,nx);
 FE_y=zeros(ny,nx);
+FD_x=zeros(ny,nx); % Diffusion force
+FD_y=zeros(ny,nx); % Diffusion force
 FE1=zeros(ny,nx);
 FE2=zeros(ny,nx);
 FE3=zeros(ny,nx);
@@ -49,7 +51,8 @@ l_eq=zeros(ny,nx,9);
 dQu_x=zeros(ny,nx);               %%%%% ADD_1
 dQu_y=zeros(ny,nx);               %%%%% ADD_2
 q_old=zeros(ny,nx);               %%%%% ADD_3
-q_new=zeros(ny,nx);               %%%%% ADD_4
+q_new=zeros(ny,nx);              %%%%% ADD_4
+di=zeros(ny,nx);                   % for calculating diffusion force term
 elpha=0.0001;                        %%%%% ADD_5 % charge diffusion coefficient
 ux_old=zeros(ny,nx);
 uy_old=zeros(ny,nx);
@@ -371,7 +374,7 @@ end
 
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%loop starts from here
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for st=1:10000000000
+for st=1:100000
     fprintf('st = %d\n', st);
     % pause(0.2)
 if (error > 0.0000001)
@@ -813,14 +816,44 @@ for i = 2:ny-1
 
     end
 end
+
+%%% calculation of diffusion force
+
+for i = 2:ny-1
+    for j = 1:nx
+di(i,j) = (elpha/sigma(i,j))*q(i,j)*q(i,j);
+    end
+end
+
+% %%% defining the gradient of diffusion force
+for i=2:ny-1
+    for j=1:nx
+        tempx=0;
+        tempy=0;
+         for k=2:9 
+             ia=i+ey(k);
+             ja=j+ex(k);
+            if ja>nx
+              ja=1;
+            elseif ja<1
+              ja=nx;
+            end
+             tempx= tempx+ex(k)*wt(k)*di(ia,ja);
+             tempy=tempy+ey(k)*wt(k)*di(ia,ja);
+         end
+FD_x(i,j)=-0.5*tempx*3;
+FD_y(i,j)=-0.5*tempy*3;
+    end
+end
+
 % 
 % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%ELECTRIC SOLVER ENDS
 % % % % %%%%%%%%%%%%%%%%%%%%%%%%% calculation of force %%%%%%%%%%%%%
 % 
 for i = 2:ny-1
     for j = 1:nx
-     Fxx(i,j)=Fs_x(i,j)+FE_x(i,j);
-     Fyy(i,j)=Fs_y(i,j)+FE_y(i,j);
+     Fxx(i,j)=Fs_x(i,j)+FE_x(i,j)+FD_x(i,j);
+     Fyy(i,j)=Fs_y(i,j)+FE_y(i,j)+FD_y(i,j);
     end
 end
 %%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
