@@ -392,8 +392,8 @@ end
 for i = 2:ny-1
     for j =1:nx
         phi_old(i,j)=phi(i,j);
-        % ux_old(i,j)=ux(i,j);
-        % uy_old(i,j)=uy(i,j);
+        ux_old(i,j)=ux(i,j);
+        uy_old(i,j)=uy(i,j);
     end
 end
 % %%% defining the gradient phi and laplace phi
@@ -815,37 +815,31 @@ end
 % end
 % % % % % %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
 % 
-for i = 2:ny-1
-    for j = 1:nx
-        FE_x(i,j)=q(i,j)*E_x(i,j);
-        FE_y(i,j)=q(i,j)*E_y(i,j);
-
-    end
-end
-
+% for i = 2:ny-1
+%     for j = 1:nx
+%         FE_x(i,j)=q(i,j)*E_x(i,j);
+%         FE_y(i,j)=q(i,j)*E_y(i,j);
+% 
+%     end
+% end
+% 
 % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%ELECTRIC SOLVER ENDS
 % % % % %%%%%%%%%%%%%%%%%%%%%%%%% calculation of force %%%%%%%%%%%%%
 % 
+% for i = 2:ny-1
+%     for j = 1:nx
+%      Fxx(i,j)=Fs_x(i,j)+FE_x(i,j);
+%      Fyy(i,j)=Fs_y(i,j)+FE_y(i,j);
+%     end
+% end
+
 for i = 2:ny-1
     for j = 1:nx
-     Fxx(i,j)=Fs_x(i,j)+FE_x(i,j);
-     Fyy(i,j)=Fs_y(i,j)+FE_y(i,j);
+     Fxx(i,j)=Fs_x(i,j);
+     Fyy(i,j)=Fs_y(i,j);
     end
 end
 
-% for i = 2:ny-1
-%     for j = 1:nx
-%      Fxx(i,j)=Fs_x(i,j);
-%      Fyy(i,j)=Fs_y(i,j);
-%     end
-% end
-%%% update the velocity
-for i = 2:ny-1
-    for j =1:nx
-        ux_old(i,j)=ux(i,j);
-        uy_old(i,j)=uy(i,j);
-    end
-end
 
 
 %%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
