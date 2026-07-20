@@ -1,4 +1,4 @@
-
+%%%% this code is written according to the paper thermodynamically consistent field Xiong et al.
 %%%%  Step1 : Wrie all the variable which we will need in the upcoming
 %%%%  equations
 clc;
