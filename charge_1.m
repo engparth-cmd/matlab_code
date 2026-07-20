@@ -709,7 +709,6 @@ end
         end
      end
     end 
-     fprintf('st = %d\n', st);
   end
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -810,13 +809,13 @@ for i=2:ny-1
 end
 % % % % %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
 
-for i = 2:ny-1
-    for j = 1:nx
-        FE_x(i,j)=q(i,j)*E_x(i,j);
-        FE_y(i,j)=q(i,j)*E_y(i,j);
-
-    end
-end
+% for i = 2:ny-1
+%     for j = 1:nx
+%         FE_x(i,j)=q(i,j)*E_x(i,j);
+%         FE_y(i,j)=q(i,j)*E_y(i,j);
+% 
+%     end
+% end
 
 %%% calculation of diffusion force
 
