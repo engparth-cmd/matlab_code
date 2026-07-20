@@ -1,4 +1,4 @@
-%%%% this code is written according to the paper thermodynamically consistent field Xiong et al.
+
 %%%%  Step1 : Wrie all the variable which we will need in the upcoming
 %%%%  equations
 clc;
@@ -7,8 +7,8 @@ L=1;
 error=1;
 nume=1;
 denom=1;
-nx=200;  %  x domain
-ny=200;  % y domain
+nx=282;  %  x domain
+ny=282;  % y domain
 [X,Y] = meshgrid(1:nx,1:ny);
 %frame_count=0;
 %figh=figure;
@@ -89,17 +89,17 @@ phi=zeros(ny,nx);
 %%%% value of the variables %%%
 phi_h=1;
 phi_l=0;
-rho_H=2;
+rho_H=1;
 rho_L=1;
-nu_H=1.0;
-nu_L=1.0;
+nu_H=1;
+nu_L=1;
 sigma_H=0.5;
 sigma_L=0.1;
-epsi_H=0.03125;
-epsi_L=0.0625;
+epsi_H=0.11045;
+epsi_L=0.2209;
 epsi_S=0.002;  % new permittivity of the dielectric material PTFE
-W=5;
-R1=25;
+W=4.7;
+R1=47;
 sig=0.001;
 kappa=3*sig*W/2;
 bita=12*sig/W;
@@ -118,7 +118,7 @@ phi_eold=zeros(ny,nx);
 phi_enew=zeros(ny,nx);
 %Set Dirichlet boundary conditions
 phi_e(1, :)=0;  % top boundary (y = 1)
-phi_e(200, :)=32;  % bottom boundary (y = ny)
+phi_e(282, :)=12.69;  % bottom boundary (y = ny)
 PH=zeros(ny,nx);
 th=5; %%%%% thickness of material %%
 theta=(5*pi)/6;
@@ -134,7 +134,7 @@ theta=(5*pi)/6;
 for i=1:ny
 for j=1:nx   
    % phi(i,j)=((phi_h+phi_l)/2)+((phi_h-phi_l)/2)*tanh(2*(R1-sqrt((j-141)^2+(i-1)^2))/W);
- phi(i,j)=0.5+0.5*tanh(2*(R1-sqrt((j-100)^2+(i-100)^2))/W);
+ phi(i,j)=0.5+0.5*tanh(2*(R1-sqrt((j-141)^2+(i-141)^2))/W);
 end
 end
 %%%%%%%
@@ -143,7 +143,7 @@ phi(1,j)=phi(2,j) ;
 phi(ny,j)=phi(ny-1,j) ;
 mu(1,j) = mu(2,j);
 mu(ny,j)= mu(ny-1,j);
- q(1,j)=q(2,j);
+q(1,j)=q(2,j);
 q(ny,j)= q(ny-1,j); 
 end
 %%% initial value for wetting boundary condition
