@@ -1,4 +1,4 @@
-%%%% this code is written according to the paper thermodynamically consistent field Xiong et al.
+
 %%%%  Step1 : Wrie all the variable which we will need in the upcoming
 %%%%  equations
 clc;
@@ -7,8 +7,8 @@ L=1;
 error=1;
 nume=1;
 denom=1;
-nx=200;  %  x domain
-ny=200;  % y domain
+nx=282;  %  x domain
+ny=282;  % y domain
 [X,Y] = meshgrid(1:nx,1:ny);
 %frame_count=0;
 %figh=figure;
@@ -30,8 +30,6 @@ Fs_x=zeros(ny,nx);
 Fs_y=zeros(ny,nx);
 FE_x=zeros(ny,nx);
 FE_y=zeros(ny,nx);
-FD_x=zeros(ny,nx); % Diffusion force
-FD_y=zeros(ny,nx); % Diffusion force
 FE1=zeros(ny,nx);
 FE2=zeros(ny,nx);
 FE3=zeros(ny,nx);
@@ -51,8 +49,7 @@ l_eq=zeros(ny,nx,9);
 dQu_x=zeros(ny,nx);               %%%%% ADD_1
 dQu_y=zeros(ny,nx);               %%%%% ADD_2
 q_old=zeros(ny,nx);               %%%%% ADD_3
-q_new=zeros(ny,nx);              %%%%% ADD_4
-di=zeros(ny,nx);                   % for calculating diffusion force term
+q_new=zeros(ny,nx);               %%%%% ADD_4
 elpha=0.0001;                        %%%%% ADD_5 % charge diffusion coefficient
 ux_old=zeros(ny,nx);
 uy_old=zeros(ny,nx);
@@ -89,17 +86,17 @@ phi=zeros(ny,nx);
 %%%% value of the variables %%%
 phi_h=1;
 phi_l=0;
-rho_H=2;
+rho_H=1;
 rho_L=1;
-nu_H=1.0;
-nu_L=1.0;
+nu_H=0.1;
+nu_L=0.1;
 sigma_H=0.5;
 sigma_L=0.1;
-epsi_H=0.03125;
-epsi_L=0.0625;
+epsi_H=0.11045;
+epsi_L=0.2209;
 epsi_S=0.002;  % new permittivity of the dielectric material PTFE
-W=5;
-R1=25;
+W=4.7;
+R1=47;
 sig=0.001;
 kappa=3*sig*W/2;
 bita=12*sig/W;
@@ -118,7 +115,7 @@ phi_eold=zeros(ny,nx);
 phi_enew=zeros(ny,nx);
 %Set Dirichlet boundary conditions
 phi_e(1, :)=0;  % top boundary (y = 1)
-phi_e(200, :)=32;  % bottom boundary (y = ny)
+phi_e(282, :)=28.2;  % bottom boundary (y = ny)
 PH=zeros(ny,nx);
 th=5; %%%%% thickness of material %%
 theta=(5*pi)/6;
@@ -134,7 +131,7 @@ theta=(5*pi)/6;
 for i=1:ny
 for j=1:nx   
    % phi(i,j)=((phi_h+phi_l)/2)+((phi_h-phi_l)/2)*tanh(2*(R1-sqrt((j-141)^2+(i-1)^2))/W);
- phi(i,j)=0.5+0.5*tanh(2*(R1-sqrt((j-100)^2+(i-100)^2))/W);
+ phi(i,j)=0.5+0.5*tanh(2*(R1-sqrt((j-141)^2+(i-141)^2))/W);
 end
 end
 %%%%%%%
@@ -143,8 +140,8 @@ phi(1,j)=phi(2,j) ;
 phi(ny,j)=phi(ny-1,j) ;
 mu(1,j) = mu(2,j);
 mu(ny,j)= mu(ny-1,j);
-%  q(2,j)=0.001;
-%  q(ny,j)= q(ny-1,j); 
+ q(1,j)=q(2,j);
+ q(ny,j)= q(ny-1,j); 
 end
 %%% initial value for wetting boundary condition
 for i=1
@@ -237,6 +234,7 @@ for i=1:ny
         gradphi_eey(i,j)=0;
         for k=1:9
             tau_h=0.5+3*epsi_L;
+            %tau_h=0.5+3*sigma(i,j);
             epsi_unit(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+tau_h/3;
             gradphi_eex(i,j)= gradphi_eex(i,j)+(ex(k)*h(i,j,k));
             gradphi_eey(i,j)= gradphi_eey(i,j)+(ey(k)*h(i,j,k)); 
@@ -374,7 +372,7 @@ end
 
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%loop starts from here
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for st=1:100000
+for st=1:10000000000
     fprintf('st = %d\n', st);
     % pause(0.2)
 if (error > 0.0000001)
@@ -618,6 +616,7 @@ for i=1:ny
         gradphi_eey(i,j)=0;
         for k=1:9
             tau_h=0.5+3*epsi_L;
+            %tau_h=0.5+3*sigma(i,j);
             epsi_unit(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+tau_h/3;
             gradphi_eex(i,j)= gradphi_eex(i,j)+(ex(k)*h(i,j,k));
             gradphi_eey(i,j)= gradphi_eey(i,j)+(ey(k)*h(i,j,k)); 
@@ -632,7 +631,7 @@ for i=1:ny
     for j=1:nx
         for k=1:9
           tau_h=0.5+3*epsi_L;      %%%% leaky dielectric model
-          %tau_h=0.5+3*sigma(i,j); 
+          %tau_h=0.5+3*sigma(i,j);
           ht(i,j,k)=-((h(i,j,k)-h_eq(i,j,k))/tau_h)+h(i,j,k)-3*(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)*wt(k)*(1/tau_h)*(ex(k)*gradphi_eex(i,j)+ey(k)*gradphi_eey(i,j))+wwt(k)*q(i,j);
         end
     end
@@ -709,7 +708,6 @@ end
         end
      end
     end 
-     fprintf('st = %d\n', st);
   end
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -744,7 +742,6 @@ for i = 2:ny-1
         dQu_y(i,j) = (q_new(i,j)*uy_new(i,j)-q_old(i,j)*uy_old(i,j));
     end
 end
-
 for i = 2:ny-1
     for j =1:nx
         q_old(i,j) =q(i,j);
@@ -806,8 +803,11 @@ for i=2:ny-1
             q(i,j)=q(i,j)+l(i,j,k);
         end
           q(i,j)=q(i,j)+0.5*R(i,j);
+           q(i,j)=0.2*q(i,j);
     end
 end
+ 
+
 % % % % %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
 
 for i = 2:ny-1
@@ -817,44 +817,14 @@ for i = 2:ny-1
 
     end
 end
-
-%%% calculation of diffusion force
-
-for i = 2:ny-1
-    for j = 1:nx
-di(i,j) = (elpha/sigma(i,j))*q(i,j)*q(i,j);
-    end
-end
-
-% %%% defining the gradient of diffusion force
-for i=2:ny-1
-    for j=1:nx
-        tempx=0;
-        tempy=0;
-         for k=2:9 
-             ia=i+ey(k);
-             ja=j+ex(k);
-            if ja>nx
-              ja=1;
-            elseif ja<1
-              ja=nx;
-            end
-             tempx= tempx+ex(k)*wt(k)*di(ia,ja);
-             tempy=tempy+ey(k)*wt(k)*di(ia,ja);
-         end
-FD_x(i,j)=-0.5*tempx*3;
-FD_y(i,j)=-0.5*tempy*3;
-    end
-end
-
 % 
 % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%ELECTRIC SOLVER ENDS
 % % % % %%%%%%%%%%%%%%%%%%%%%%%%% calculation of force %%%%%%%%%%%%%
 % 
 for i = 2:ny-1
     for j = 1:nx
-     Fxx(i,j)=Fs_x(i,j)+FE_x(i,j)+FD_x(i,j);
-     Fyy(i,j)=Fs_y(i,j)+FE_y(i,j)+FD_y(i,j);
+     Fxx(i,j)=Fs_x(i,j)+FE_x(i,j);
+     Fyy(i,j)=Fs_y(i,j)+FE_y(i,j);
     end
 end
 %%% update the velocity
@@ -864,7 +834,6 @@ for i = 2:ny-1
         uy_old(i,j)=uy(i,j);
     end
 end
-
 %%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % % %%%%%%%%%%%%%%%%%%% calculation of Ri %%%%%%%%%%%%%%%%%%%%%%%%
 
