@@ -118,7 +118,7 @@ phi_eold=zeros(ny,nx);
 phi_enew=zeros(ny,nx);
 %Set Dirichlet boundary conditions
 phi_e(1, :)=0;  % top boundary (y = 1)
-phi_e(200, :)=20;  % bottom boundary (y = ny)
+phi_e(200, :)=32;  % bottom boundary (y = ny)
 PH=zeros(ny,nx);
 th=5; %%%%% thickness of material %%
 theta=(5*pi)/6;
