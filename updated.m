@@ -50,7 +50,7 @@ dQu_x=zeros(ny,nx);               %%%%% ADD_1
 dQu_y=zeros(ny,nx);               %%%%% ADD_2
 q_old=zeros(ny,nx);               %%%%% ADD_3
 q_new=zeros(ny,nx);               %%%%% ADD_4
-elpha=0.1;                        %%%%% ADD_5 % charge diffusion coefficient
+elpha=0.0001;                        %%%%% ADD_5 % charge diffusion coefficient
 ux_old=zeros(ny,nx);
 uy_old=zeros(ny,nx);
 ux_new=zeros(ny,nx);
@@ -92,8 +92,8 @@ nu_H=0.1;
 nu_L=0.1;
 sigma_H=0.5;
 sigma_L=0.1;
-epsi_H=0.05;
-epsi_L=0.1;
+epsi_H=0.11045;
+epsi_L=0.2209;
 epsi_S=0.002;  % new permittivity of the dielectric material PTFE
 W=4.7;
 R1=47;
@@ -140,8 +140,8 @@ phi(1,j)=phi(2,j) ;
 phi(ny,j)=phi(ny-1,j) ;
 mu(1,j) = mu(2,j);
 mu(ny,j)= mu(ny-1,j);
-%  q(2,j)=0.001;
-%  q(ny,j)= q(ny-1,j); 
+ q(1,j)=q(2,j);
+ q(ny,j)= q(ny-1,j); 
 end
 %%% initial value for wetting boundary condition
 for i=1
@@ -234,6 +234,7 @@ for i=1:ny
         gradphi_eey(i,j)=0;
         for k=1:9
             tau_h=0.5+3*epsi_L;
+            %tau_h=0.5+3*sigma(i,j);
             epsi_unit(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+tau_h/3;
             gradphi_eex(i,j)= gradphi_eex(i,j)+(ex(k)*h(i,j,k));
             gradphi_eey(i,j)= gradphi_eey(i,j)+(ey(k)*h(i,j,k)); 
@@ -615,6 +616,7 @@ for i=1:ny
         gradphi_eey(i,j)=0;
         for k=1:9
             tau_h=0.5+3*epsi_L;
+            %tau_h=0.5+3*sigma(i,j);
             epsi_unit(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+tau_h/3;
             gradphi_eex(i,j)= gradphi_eex(i,j)+(ex(k)*h(i,j,k));
             gradphi_eey(i,j)= gradphi_eey(i,j)+(ey(k)*h(i,j,k)); 
@@ -629,7 +631,7 @@ for i=1:ny
     for j=1:nx
         for k=1:9
           tau_h=0.5+3*epsi_L;      %%%% leaky dielectric model
-          % tau_h=0.5+3*sigma(i,j); 
+          %tau_h=0.5+3*sigma(i,j);
           ht(i,j,k)=-((h(i,j,k)-h_eq(i,j,k))/tau_h)+h(i,j,k)-3*(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)*wt(k)*(1/tau_h)*(ex(k)*gradphi_eex(i,j)+ey(k)*gradphi_eey(i,j))+wwt(k)*q(i,j);
         end
     end
@@ -726,24 +728,9 @@ for i = 1:ny
    E2(i,j)=E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j);
     end
 end
-
-% %%%%%%%%%%%%%%%%%%%%% for dielectric model %%%%%%%%%%%%%%%%%%%%%%
-
-% 
-% %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
-% 
-% 
-% for i = 2:ny-1
-%     for j = 1:nx
-%         FE_x(i,j)=-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*g_phix(i,j)*E2(i,j);
-%         FE_y(i,j)=-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*g_phiy(i,j)*E2(i,j);
-% 
-%     end
-% end
-
-% % % %%%%%%%%%%%% calculation of  Nernst-Planck equation %%%%%%%%%%%%%%%5
-% % % 
-% % %%%%%% calculation of forcing term R %%%%%%%%%%%%%%%%%%%%
+% % %%%%%%%%%%%% calculation of  Nernst-Planck equation %%%%%%%%%%%%%%%5
+% % 
+% %%%%%% calculation of forcing term R %%%%%%%%%%%%%%%%%%%%
 for i= 2:ny-1
     for j= 1:nx
 R(i,j)=(-sigma(i,j)*q(i,j)/epsi(i,j))+(sigma(i,j)/epsi(i,j))*(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(epsi_L-epsi_H)*(phi(i,j)-1)*phi(i,j)*6-(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(sigma_H-sigma_L);
@@ -755,18 +742,18 @@ for i = 2:ny-1
         dQu_y(i,j) = (q_new(i,j)*uy_new(i,j)-q_old(i,j)*uy_old(i,j));
     end
 end
- for i = 2:ny-1
+for i = 2:ny-1
     for j =1:nx
         q_old(i,j) =q(i,j);
     end
 end
-% % % %%%%%% calculation of Si and Ti %%%%%%%%%%%%%%%%%%%%%
+% % %%%%%% calculation of Si and Ti %%%%%%%%%%%%%%%%%%%%%
 for i= 2:ny-1
     for j= 1:nx
         for k=1:9
             tau_l=0.5+3*elpha;
             S(i,j,k)=(1-0.5/tau_l)*wt(k)*R(i,j);
-            %T(i,j,k)=3*(1-0.5/tau_l)*wt(k)*(ex(k)*dQu_x(i,j)+ey(k)*dQu_y(i,j));
+            T(i,j,k)=3*(1-0.5/tau_l)*wt(k)*(ex(k)*dQu_x(i,j)+ey(k)*dQu_y(i,j));
         end
     end
 end
@@ -778,10 +765,10 @@ end
         end
      end
  end
-% % % % %%% streaming of NERNST PLANCK EQUATION
-% % % % 
-% % % % streaming of post collision particle distribution
+% % % %%% streaming of NERNST PLANCK EQUATION
 % % % 
+% % % streaming of post collision particle distribution
+% % 
 for i=2:ny-1
     for j=1:nx
        for k=1:9
@@ -796,7 +783,7 @@ for i=2:ny-1
         end  
     end
 end 
-% % % % Boundary condition
+% % % Boundary condition
 for j=1:nx
     i=2;
          l(i,j,3)=lt(1,j,5);
@@ -816,10 +803,13 @@ for i=2:ny-1
             q(i,j)=q(i,j)+l(i,j,k);
         end
           q(i,j)=q(i,j)+0.5*R(i,j);
+           q(i,j)=0.2*q(i,j);
     end
 end
-% % % % % %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
-% 
+ 
+
+% % % % %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
+
 for i = 2:ny-1
     for j = 1:nx
         FE_x(i,j)=q(i,j)*E_x(i,j);
@@ -837,22 +827,13 @@ for i = 2:ny-1
      Fyy(i,j)=Fs_y(i,j)+FE_y(i,j);
     end
 end
-
-% for i = 2:ny-1
-%     for j = 1:nx
-%      Fxx(i,j)=Fs_x(i,j);
-%      Fyy(i,j)=Fs_y(i,j);
-%     end
-% end
+%%% update the velocity
 for i = 2:ny-1
     for j =1:nx
-        
         ux_old(i,j)=ux(i,j);
         uy_old(i,j)=uy(i,j);
     end
 end
-
-
 %%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % % %%%%%%%%%%%%%%%%%%% calculation of Ri %%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1034,19 +1015,19 @@ load('results.mat');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Uncomment it for observing the droplet
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%
 % 
-figure(302); clf; set(gcf,'Color','w');
-
-imagesc([1 size(X,2)], [1 size(Y,1)], phi);
-axis image tight;
-set(gca,'YDir','normal');           % origin at bottom-left
-colormap('jet'); colorbar;
-
-xlabel('x'); ylabel('y');
-title(sprintf('Phase field  \\phi  (step %d)', step), ...
-      'Interpreter','tex','FontSize',12);               
-
-Optional: emphasize droplet interface (φ=0 contour)
-hold on;
-contour(X, Y, phi, [0 0], 'w', 'LineWidth', 1.2);
-
-drawnow;
+% figure(302); clf; set(gcf,'Color','w');
+% 
+% imagesc([1 size(X,2)], [1 size(Y,1)], phi);
+% axis image tight;
+% set(gca,'YDir','normal');           % origin at bottom-left
+% colormap('jet'); colorbar;
+% 
+% xlabel('x'); ylabel('y');
+% title(sprintf('Phase field  \\phi  (step %d)', step), ...
+%       'Interpreter','tex','FontSize',12);               
+% 
+% Optional: emphasize droplet interface (φ=0 contour)
+% hold on;
+% contour(X, Y, phi, [0 0], 'w', 'LineWidth', 1.2);
+% 
+% drawnow;
