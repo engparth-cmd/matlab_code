@@ -7,8 +7,8 @@ L=1;
 error=1;
 nume=1;
 denom=1;
-nx=282;  %  x domain
-ny=282;  % y domain
+nx=200;  %  x domain
+ny=200;  % y domain
 [X,Y] = meshgrid(1:nx,1:ny);
 %frame_count=0;
 %figh=figure;
@@ -89,17 +89,17 @@ phi=zeros(ny,nx);
 %%%% value of the variables %%%
 phi_h=1;
 phi_l=0;
-rho_H=1;
+rho_H=2;
 rho_L=1;
-nu_H=0.1;
-nu_L=0.1;
+nu_H=1.0;
+nu_L=1.0;
 sigma_H=0.5;
 sigma_L=0.1;
-epsi_H=0.05;
-epsi_L=0.1;
+epsi_H=0.03125;
+epsi_L=0.0625;
 epsi_S=0.002;  % new permittivity of the dielectric material PTFE
-W=4.7;
-R1=47;
+W=5;
+R1=25;
 sig=0.001;
 kappa=3*sig*W/2;
 bita=12*sig/W;
@@ -118,7 +118,7 @@ phi_eold=zeros(ny,nx);
 phi_enew=zeros(ny,nx);
 %Set Dirichlet boundary conditions
 phi_e(1, :)=0;  % top boundary (y = 1)
-phi_e(282, :)=28.2;  % bottom boundary (y = ny)
+phi_e(200, :)=20;  % bottom boundary (y = ny)
 PH=zeros(ny,nx);
 th=5; %%%%% thickness of material %%
 theta=(5*pi)/6;
