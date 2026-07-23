@@ -1,4 +1,3 @@
-
 %%%%  Step1 : Wrie all the variable which we will need in the upcoming
 %%%%  equations
 clc;
@@ -374,14 +373,11 @@ end
 
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%loop starts from here
 % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for st=1:1000000
-    fprintf('st = %d\n', st);
-    % pause(0.2)
-if (error > 0.0000001)
-for step=1:10
-    % pause(0.5)
-   fprintf('step = %d\n', step);
-   fprintf('error = %d\n', error);
+
+% % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%loop starts from here
+for st = 1:10000000000
+ fprintf('st = %d\n', st);
+for step = 1:1000
 %% calculation of Cahn-Hilliard equation
 
 for i = 2:ny-1
@@ -395,23 +391,15 @@ end
 for i = 2:ny-1
     for j =1:nx
         phi_old(i,j)=phi(i,j);
-        % ux_old(i,j)=ux(i,j);
-        % uy_old(i,j)=uy(i,j);
     end
 end
-% %%% defining the gradient phi and laplace phi
+
 for i=2:ny-1
     for j=1:nx
-        tempx=0;
-        tempy=0;
-         for k=2:9 
-             ia=i+ey(k);
-             ja=j+ex(k);
-            if ja>nx
-              ja=1;
-            elseif ja<1
-              ja=nx;
-            end
+        tempx=0; tempy=0;
+         for k=2:9
+             ia=i+ey(k); ja=j+ex(k);
+            if ja>nx, ja=1; elseif ja<1, ja=nx; end
              tempx= tempx+ex(k)*wt(k)*phi(ia,ja);
              tempy=tempy+ey(k)*wt(k)*phi(ia,ja);
          end
@@ -419,31 +407,23 @@ g_phix(i,j)=tempx*3;
 g_phiy(i,j)=tempy*3;
     end
 end
-% % % calculation of normal
 for i=2:ny-1
     for j=1:nx
            z(i,j)=sqrt(g_phix(i,j)^2+g_phiy(i,j)^2)+0.00000000001;
     end
 end
-% % % % % calculation of laplace phi
 for i=2:ny-1
     for j=1:nx
         tempx1=0;
-         for k=2:9 
-             ia=i+ey(k);
-             ja=j+ex(k);
-            if ja>nx
-              ja=1;
-            elseif ja<1
-              ja=nx;
-            end
+         for k=2:9
+             ia=i+ey(k); ja=j+ex(k);
+            if ja>nx, ja=1; elseif ja<1, ja=nx; end
              tempx1= tempx1 + wt(k)*(phi(ia,ja)-phi(i,j));
          end
 L_phi(i,j)=tempx1*6;
     end
 end
 
-% %%% calculation of the equilibrium distribution function for Cahn-Hilliard
 for i=1:ny
 for j=1:nx
 for k=1:9
@@ -456,8 +436,6 @@ end
 end
 end
 
-
-% %%%%% calculation of force for phase field source term %%%%
 for i=2:ny-1
     for j=1:nx
         for k = 1:9
@@ -465,36 +443,23 @@ for i=2:ny-1
         end
     end
 end
-% % streaming of post collision particle distribution
 for i=2:ny-1
     for j=1:nx
        for k=1:9
-        ia=i+ey(k);
-        ja=j+ex(k);
-
-        if ja>nx
-          ja=1;
-        elseif ja<1
-          ja=nx;
+        ia=i+ey(k); ja=j+ex(k);
+        if ja>nx, ja=1; elseif ja<1, ja=nx; end
+         f(ia,ja,k)=ft(i,j,k);
         end
-         f(ia,ja,k)=ft(i,j,k);  
-        end  
     end
-end 
-% % Boundary condition
+end
 for j=1:nx
 for i=2
-        f(i,j,6)=ft(i,j,8);
-         f(i,j,3)=ft(i,j,5);
-          f(i,j,7)=ft(i,j,9);
+        f(i,j,6)=ft(i,j,8); f(i,j,3)=ft(i,j,5); f(i,j,7)=ft(i,j,9);
 end
 for i=ny-1
-        f(i,j,9)=ft(i,j,7);
-        f(i,j,5)=ft(i,j,3);
-        f(i,j,8)=ft(i,j,6);
+        f(i,j,9)=ft(i,j,7); f(i,j,5)=ft(i,j,3); f(i,j,8)=ft(i,j,6);
 end
 end
-%     % calculation of phi
 for i=2:ny-1
     for j=1:nx
         PH(i,j)=0;
@@ -504,17 +469,15 @@ for i=2:ny-1
         phi(i,j)= PH(i,j);
     end
 end
-%%%%% Wetting boundary condition %%%%%%%%%%%%%%%%%
 
-%% initial value for wetting boundary condition
+%%%%% Wetting boundary condition %%%%%%%%%%%%%%%%%
 for i=1
-for j=1:nx   
+for j=1:nx
   tita(i,j)=cos(theta)+0.5*(epsi_S*phi_e(i,j)*phi_e(i,j))/(sig*th);
 end
 end
 for i=1
-for j=1:nx 
-
+for j=1:nx
 zeta(i,j)=-sqrt((2*bita)/kappa)*tita(i,j);
 a(i,j)=0.5*zeta(i,j);
 end
@@ -522,10 +485,9 @@ end
 for i=1
     for j=1:nx
        phi(i,j)=(1/a(i,j))*(1+a(i,j)-sqrt(((1+a(i,j))^2)-4*a(i,j)*phi(i+1,j)))-phi(i+1,j);
-
     end
 end
-% % %%% calculation of equation 19
+
 for i =1:ny
 for j =1:nx
      rho(i,j)=((rho_H-rho_L))*phi(i,j)+rho_L;
@@ -534,19 +496,13 @@ for j =1:nx
      epsi(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+epsi_L;
 end
 end
-% %%% defining the gradient  new phi and new laplace phi
+
 for i=2:ny-1
     for j=1:nx
-        tempx=0;
-        tempy=0;
-         for k=2:9 
-             ia=i+ey(k);
-             ja=j+ex(k);
-            if ja>nx
-              ja=1;
-            elseif ja<1
-              ja=nx;
-            end
+        tempx=0; tempy=0;
+         for k=2:9
+             ia=i+ey(k); ja=j+ex(k);
+            if ja>nx, ja=1; elseif ja<1, ja=nx; end
              tempx= tempx+ex(k)*wt(k)*phi(ia,ja);
              tempy=tempy+ey(k)*wt(k)*phi(ia,ja);
          end
@@ -554,50 +510,38 @@ g_phix(i,j)=tempx*3;
 g_phiy(i,j)=tempy*3;
     end
 end
-% % % calculation of new normal
 for i=2:ny-1
     for j=1:nx
            z(i,j)=sqrt(g_phix(i,j)^2+g_phiy(i,j)^2)+0.00000000001;
     end
 end
-% % % % % calculation of new laplace phi
 for i=2:ny-1
     for j=1:nx
         tempx1=0;
-         for k=2:9 
-             ia=i+ey(k);
-             ja=j+ex(k);
-            if ja>nx
-              ja=1;
-            elseif ja<1
-              ja=nx;
-            end
+         for k=2:9
+             ia=i+ey(k); ja=j+ex(k);
+            if ja>nx, ja=1; elseif ja<1, ja=nx; end
              tempx1= tempx1 + wt(k)*(phi(ia,ja)-phi(i,j));
          end
 L_phi(i,j)=tempx1*6;
     end
 end
-% % % calculation of mu according to Cahn-Hilliard equation
 for i=2:ny-1
     for j=1:nx
  mu(i,j)=4*bita*phi(i,j)*(phi(i,j)-0.5)*(phi(i,j)-1)-kappa*L_phi(i,j)-3*phi(i,j)*(phi(i,j)-1)*(epsi_L-epsi_H)*(E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j));
     end
 end
-% %calculation of Fs
 for i=2:ny-1
     for j=1:nx
             Fs_x(i,j)=mu(i,j)*g_phix(i,j);
             Fs_y(i,j)=mu(i,j)*g_phiy(i,j);
     end
 end
-        L=1;
-% % % %%%%%%%%%%%%%%%%%%%%% ELECTRIC SOLVER  STARTS
-% % % 
-% % % % %%%% implementing the equation of electric
-% % % %  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% electric part of model time step loop%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- for le=1:1000000000
+L=1;
+
+%%%%%%%%%%%%%%%%%%%%%%% ELECTRIC SOLVER STARTS %%%%%%%%%%%%%%%%%%%%%%%
+for le=1:1000000000
     if (L > 0.0000001)
-        % pause(0.1)
      fprintf('le = %d\n', le);
      fprintf('L= %d\n', L);
  for i=1:ny
@@ -606,78 +550,53 @@ end
            if k==1
                 h_eq(i,j,k)=(wt(k)-1)*phi_e(i,j);
             else
-                h_eq(i,j,k)=wt(k)*phi_e(i,j);   
+                h_eq(i,j,k)=wt(k)*phi_e(i,j);
            end
         end
      end
  end
-% % %%%% calculation of gradient of electric potential
 for i=1:ny
     for j=1:nx
-        gradphi_eex(i,j)=0;
-        gradphi_eey(i,j)=0;
+        gradphi_eex(i,j)=0; gradphi_eey(i,j)=0;
         for k=1:9
             tau_h=0.5+3*epsi_L;
             epsi_unit(i,j)=(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)+tau_h/3;
             gradphi_eex(i,j)= gradphi_eex(i,j)+(ex(k)*h(i,j,k));
-            gradphi_eey(i,j)= gradphi_eey(i,j)+(ey(k)*h(i,j,k)); 
+            gradphi_eey(i,j)= gradphi_eey(i,j)+(ey(k)*h(i,j,k));
         end
         gradphi_eex(i,j)= -gradphi_eex(i,j)/epsi_unit(i,j);
         gradphi_eey(i,j)= -gradphi_eey(i,j)/epsi_unit(i,j);
     end
 end
-
-% % %% calculation of distribution function for electric potential
 for i=1:ny
     for j=1:nx
         for k=1:9
-          tau_h=0.5+3*epsi_L;      %%%% leaky dielectric model
-          %tau_h=0.5+3*sigma(i,j); 
+          tau_h=0.5+3*epsi_L;
           ht(i,j,k)=-((h(i,j,k)-h_eq(i,j,k))/tau_h)+h(i,j,k)-3*(epsi_L-epsi_H)*phi(i,j)*phi(i,j)*(2*phi(i,j)-3)*wt(k)*(1/tau_h)*(ex(k)*gradphi_eex(i,j)+ey(k)*gradphi_eey(i,j))+wwt(k)*q(i,j);
         end
     end
 end
-
-% % % %%% streaming of electric potential
-% % % 
-% % % % streaming of post collision particle distribution
-% % % 
 for i=2:ny-1
     for j=1:nx
        for k=1:9
-        ia=i+ey(k);
-        ja=j+ex(k);
-        if ja>nx
-          ja=1;
-        elseif ja<1
-          ja=nx;
+        ia=i+ey(k); ja=j+ex(k);
+        if ja>nx, ja=1; elseif ja<1, ja=nx; end
+           h(ia,ja,k)=ht(i,j,k);
         end
-           h(ia,ja,k)=ht(i,j,k);  
-        end  
     end
-end 
-% % % % Boundary condition
+end
 for j=1:nx
 for  i=2
-
          h(i,j,3)=-ht(1,j,5);
-
          h(i,j,6)=-ht(1,j,8);
-
          h(i,j,7)=-ht(1,j,9);
 end
-
    for i=ny-1
-        h(i,j,5)=-ht(ny,j,3)+2*wt(3)*13;     
+        h(i,j,5)=-ht(ny,j,3)+2*wt(3)*13;
         h(i,j,8)=-ht(ny,j,6)+2*wt(6)*13;
         h(i,j,9)=-ht(ny,j,7)+2*wt(7)*13;
-
-
    end
  end
-
-% % % %%% convergence criteria for electric potential
-% % % % calculation of phi_e
 for i=2:ny-1
     for j=1:nx
         phi_e(i,j)=0;
@@ -691,48 +610,38 @@ for i=1:ny
 phi_enew(i,j) = phi_e(i,j);
     end
 end
-% % % % --- Compute error using loops ---
-    numerator=0;
-    denominator=0;
+    numerator=0; denominator=0;
     for i=1:ny
         for j=1:nx
             numerator=numerator+(phi_enew(i,j)-phi_eold(i,j))^2;
             denominator=denominator+(phi_enew(i,j))^2;
         end
     end
-
     L=numerator/(denominator);
     L=sqrt(L);
-     for    i=2:ny-1
+     for i=2:ny-1
         for j = 1:nx
           phi_eold(i,j) = phi_enew(i,j);
         end
      end
-    end 
-     fprintf('st = %d\n', st);
+    end
   end
+%%%%%%%%%%%%%%%%%%%%%%% ELECTRIC SOLVER ENDS (potential part) %%%%%%%%%%
 
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
  L=1;
-% % %   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%         
-% % % %%%%%%Compute E_x and E_y (Electric field):%%%%%%%%%%%%%%%%%%
-
 for i =1:ny
     for j =1:nx
         E_x(i,j)=-gradphi_eex(i,j);
         E_y(i,j)=-gradphi_eey(i,j);
     end
 end
-% % % % % %%%%%%%%%%%%%%%%%%%%%% Compute E^2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % % % 
 for i = 1:ny
     for j =1:nx
    E2(i,j)=E_x(i,j)*E_x(i,j)+E_y(i,j)*E_y(i,j);
     end
 end
-% %%%%%%%%%%%% calculation of  Nernst-Planck equation %%%%%%%%%%%%%%%5
-% 
-%%%%%% calculation of forcing term R %%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%% Nernst-Planck equation %%%%%%%%%%%%%%%
 for i= 2:ny-1
     for j= 1:nx
 R(i,j)=(-sigma(i,j)*q(i,j)/epsi(i,j))+(sigma(i,j)/epsi(i,j))*(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(epsi_L-epsi_H)*(phi(i,j)-1)*phi(i,j)*6-(g_phix(i,j)*E_x(i,j)+g_phiy(i,j)*E_y(i,j))*(sigma_H-sigma_L);
@@ -744,13 +653,11 @@ for i = 2:ny-1
         dQu_y(i,j) = (q_new(i,j)*uy_new(i,j)-q_old(i,j)*uy_old(i,j));
     end
 end
-
 for i = 2:ny-1
     for j =1:nx
         q_old(i,j) =q(i,j);
     end
 end
-% %%%%%% calculation of Si and Ti %%%%%%%%%%%%%%%%%%%%%
 for i= 2:ny-1
     for j= 1:nx
         for k=1:9
@@ -768,36 +675,22 @@ end
         end
      end
  end
-% % %%% streaming of NERNST PLANCK EQUATION
-% % 
-% % streaming of post collision particle distribution
-% 
 for i=2:ny-1
     for j=1:nx
        for k=1:9
-        ia=i+ey(k);
-        ja=j+ex(k);
-        if ja>nx
-          ja=1;
-        elseif ja<1
-          ja=nx;
+        ia=i+ey(k); ja=j+ex(k);
+        if ja>nx, ja=1; elseif ja<1, ja=nx; end
+        l(ia,ja,k)=lt(i,j,k);
         end
-        l(ia,ja,k)=lt(i,j,k);  
-        end  
     end
-end 
-% % % Boundary condition
+end
 for j=1:nx
     i=2;
-         l(i,j,3)=lt(1,j,5);
-         l(i,j,6)=lt(1,j,8);
-         l(i,j,7)=lt(1,j,9);
+         l(i,j,3)=lt(1,j,5); l(i,j,6)=lt(1,j,8); l(i,j,7)=lt(1,j,9);
 end
 for j=1:nx
     i=ny-1;
-        l(i,j,5)=lt(ny,j,3);     
-        l(i,j,8)=lt(ny,j,6);
-        l(i,j,9)=lt(ny,j,7);
+        l(i,j,5)=lt(ny,j,3); l(i,j,8)=lt(ny,j,6); l(i,j,9)=lt(ny,j,7);
 end
 for i=2:ny-1
     for j=1:nx
@@ -806,64 +699,25 @@ for i=2:ny-1
             q(i,j)=q(i,j)+l(i,j,k);
         end
           q(i,j)=q(i,j)+0.5*R(i,j);
-          % q(i,j)=0.2*q(i,j);
+          % NOTE: removed the extra "q(i,j)=0.2*q(i,j);" damping line —
+          % it was artificially killing the charge/force every step.
     end
 end
-% % % %%%%%%%%%%%%%%%%%%Electric force calculation %%%%%%%%%%%%%%%%%
 
 for i = 2:ny-1
     for j = 1:nx
         FE_x(i,j)=q(i,j)*E_x(i,j);
         FE_y(i,j)=q(i,j)*E_y(i,j);
-
     end
 end
 
-% %%% calculation of diffusion force
-% 
-% for i = 2:ny-1
-%     for j = 1:nx
-% di(i,j) = (elpha/sigma(i,j))*q(i,j)*q(i,j);
-%     end
-% end
-% 
-% % %%% defining the gradient of diffusion force
-% for i=2:ny-1
-%     for j=1:nx
-%         tempx=0;
-%         tempy=0;
-%          for k=2:9 
-%              ia=i+ey(k);
-%              ja=j+ex(k);
-%             if ja>nx
-%               ja=1;
-%             elseif ja<1
-%               ja=nx;
-%             end
-%              tempx= tempx+ex(k)*wt(k)*di(ia,ja);
-%              tempy=tempy+ey(k)*wt(k)*di(ia,ja);
-%          end
-% FD_x(i,j)=-0.5*tempx*3;
-% FD_y(i,j)=-0.5*tempy*3;
-%     end
-% end
-
-% 
-% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%ELECTRIC SOLVER ENDS
-% % % % %%%%%%%%%%%%%%%%%%%%%%%%% calculation of force %%%%%%%%%%%%%
-% 
 for i = 2:ny-1
     for j = 1:nx
-     % Fxx(i,j)=Fs_x(i,j)+FE_x(i,j)+FD_x(i,j);
-     % % Fyy(i,j)=Fs_y(i,j)+FE_y(i,j)+FD_y(i,j);
      Fxx(i,j)=Fs_x(i,j)+FE_x(i,j);
      Fyy(i,j)=Fs_y(i,j)+FE_y(i,j);
-     % 
-     % Fxx(i,j)=Fs_x(i,j);
-     % Fyy(i,j)=Fs_y(i,j);
     end
 end
-%%% update the velocity
+
 for i = 2:ny-1
     for j =1:nx
         ux_old(i,j)=ux(i,j);
@@ -871,45 +725,34 @@ for i = 2:ny-1
     end
 end
 
-%%%%%% calculation of hydrodynamic equation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % % %%%%%%%%%%%%%%%%%%% calculation of Ri %%%%%%%%%%%%%%%%%%%%%%%%
-
 for i = 2:ny-1
     for j = 1:nx
         for k = 1:9
-            % Dot product u ⋅ ∇ρ
             A1 =(rho_H-rho_L)*(ux(i,j)*g_phix(i,j)+uy(i,j)*g_phiy(i,j));
-            % Force term: ci ⋅ F
             A2 = ex(k)*Fxx(i,j)+ey(k)*Fyy(i,j);
-            % Tensor contraction term
-            Q =(rho_H-rho_L)*((ex(k)*ex(k)-(1/3))*ux(i,j)*g_phix(i,j)+(ey(k)*ey(k)-(1/3))*uy(i,j)*g_phiy(i,j)+ex(k)*ey(k)*(ux(i,j)*g_phiy(i,j)+uy(i,j)*g_phix(i,j)));  % cross terms
-
-            % Final R_i
+            Q =(rho_H-rho_L)*((ex(k)*ex(k)-(1/3))*ux(i,j)*g_phix(i,j)+(ey(k)*ey(k)-(1/3))*uy(i,j)*g_phiy(i,j)+ex(k)*ey(k)*(ux(i,j)*g_phiy(i,j)+uy(i,j)*g_phix(i,j)));
             Ri(i,j,k) = wt(k)*(A1+3*A2+3*Q);
         end
     end
 end
-% % % %%%%%%%%%%%%%%%%%%%calculation of si %%%%%%%%%%%%%%%%
 
 for i = 2:ny-1
  for j = 1:nx
      for k = 1:9
-    DD= ex(k)*ux(i,j) + ey(k)*uy(i,j);   
-    SS= ux(i,j)^2 + uy(i,j)^2;          
+    DD= ex(k)*ux(i,j) + ey(k)*uy(i,j);
+    SS= ux(i,j)^2 + uy(i,j)^2;
     si(i,j,k) = wt(k)*(3*DD +4.5*((DD)^2)-1.5*SS);
       end
   end
 end
 
-% % % %%%%%%%%%%%%%%%%%%%%%%%%%distribution function for fluid flow
-% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for i=2:ny-1
     for j=1:nx
         for k=1:9
            if k==1
                 g_eq(i,j,k)=(wt(k)-1)*p(i,j)*3+rho(i,j)*si(i,j,k);
             else
-                g_eq(i,j,k)=3*wt(k)*p(i,j)+rho(i,j)*si(i,j,k);   
+                g_eq(i,j,k)=3*wt(k)*p(i,j)+rho(i,j)*si(i,j,k);
            end
         end
      end
@@ -925,54 +768,34 @@ end
 for i=2:ny-1
     for j=1:nx
        for k=1:9
-        ia=i+ey(k);
-        ja=j+ex(k);
-
-        if ja>nx
-          ja=1;
-        elseif ja<1
-          ja=nx;
+        ia=i+ey(k); ja=j+ex(k);
+        if ja>nx, ja=1; elseif ja<1, ja=nx; end
+                g(ia,ja,k)=gt(i,j,k);
         end
-                g(ia,ja,k)=gt(i,j,k);  
-
-        end  
     end
-end 
-% % % %%% calculating the order parameter
-% % % % Boundary condition
+end
 for j=1:nx
     i=2;
-        g(i,j,6)=gt(i,j,8);
-         g(i,j,3)=gt(i,j,5);
-          g(i,j,7)=gt(i,j,9);
-
+        g(i,j,6)=gt(i,j,8); g(i,j,3)=gt(i,j,5); g(i,j,7)=gt(i,j,9);
    i=ny-1;
-
-        g(i,j,9)=gt(i,j,7);
-        g(i,j,5)=gt(i,j,3);
-        g(i,j,8)=gt(i,j,6);
-
+        g(i,j,9)=gt(i,j,7); g(i,j,5)=gt(i,j,3); g(i,j,8)=gt(i,j,6);
 end
-% % % %%%%%%%%%%%% calculation of velocity  
-% % % %%%%%%%%%%%% %%%%%%%%%%%%%%%%%%%%%
 for i=2:ny-1
     for j=1:nx
-      ux(i,j)=0;
-      uy(i,j)=0;
+      ux(i,j)=0; uy(i,j)=0;
 for k = 1:9
     ux(i,j) = ux(i,j) + ex(k)*g(i,j,k);
     uy(i,j) = uy(i,j)+ ey(k)*g(i,j,k);
 end
 ux(i,j)=(ux(i,j)+0.5*Fxx(i,j))/rho(i,j);
 uy(i,j)=(uy(i,j)+0.5*Fyy(i,j))/rho(i,j);
-   end 
+   end
 end
-% % % %%%%%%%%%%%%%%%%%%%%%%%%%% calculation of hydrodynamic pressure%%%%%%%%%%%%%%%%55
 for i =2:ny-1
  for j =1:nx
      for k = 1
-    DD= ex(k)*ux(i,j) + ey(k)*uy(i,j);   
-    SS= ux(i,j)^2 + uy(i,j)^2;          
+    DD= ex(k)*ux(i,j) + ey(k)*uy(i,j);
+    SS= ux(i,j)^2 + uy(i,j)^2;
     so(i,j) = wt(k)*(3*DD +4.5*(DD^2)-1.5*SS);
       end
   end
@@ -984,7 +807,7 @@ for i=2:ny-1
     p(i,j)=p(i,j) + g(i,j,k);
         end
       p(i,j)= 0.6*((p(i,j)+0.5*(rho_H-rho_L)*(ux(i,j)*g_phix(i,j)+uy(i,j)*g_phiy(i,j))+rho(i,j)*so(i,j)));
-   end 
+   end
 end
 for i=2:ny-1
     for j=1:nx
@@ -993,78 +816,43 @@ for i=2:ny-1
      uy_new(i,j) =uy(i,j);
      phi_now(i,j) = phi(i,j);
      q_new(i,j) =q(i,j);
-   end 
+   end
 end
-% %  %% Every 1000 steps, check convergence
-    if mod(step, 1000)== 0
-        nume = 0;
-        denom= 0;
-         for i= 2:ny-1
-            for j = 1:nx
-                nume = nume + abs(phi_now(i,j)-phi_ot(i,j));
-                denom = denom+abs(phi_now(i,j));
-            end
-        end
-        error = nume/(denom);  % avoid divide-by-zero
-        for i=2:ny-1
-        for j=1:nx
-        phi_ot(i,j) = phi(i,j);
-       end 
-        end
+
+end   % <-- end of "for step = 1:1000"
+
+%% Compute error ONCE per outer (st) iteration, after the 1000 inner steps
+nume = 0; denom = 0;
+for i= 2:ny-1
+    for j = 1:nx
+        nume = nume + abs(phi_now(i,j)-phi_ot(i,j));
+        denom = denom+abs(phi_now(i,j));
     end
 end
+error = nume/denom;
+for i=2:ny-1
+    for j=1:nx
+        phi_ot(i,j) = phi(i,j);
+    end
 end
+
+fprintf('st = %d   error = %e\n', st, error);
+
+%% Live visualization every 20 outer steps (20,000 lattice sweeps)
+if mod(st,20)==0
+    figure(1); clf;
+    imagesc(phi); axis image; set(gca,'YDir','normal');
+    colorbar; caxis([0 1]);
+    title(sprintf('\\phi   st=%d   error=%.3e   max|q|=%.2e', st, error, max(abs(q(:)))));
+    drawnow;
 end
+
+%% Real stopping condition — now actually exits instead of freezing silently
+if error < 1e-7
+    fprintf('Converged at st = %d\n', st);
+    break;
+end
+
+end   % <-- end of "for st = ..."
+
 save('results.mat');
-load('results.mat');
-
-
-
-% figure(1); clf
-% 
-% phi_plot = real(phi);
-% phi_plot(~isfinite(phi_plot)) = NaN;
-% 
-% imagesc(phi_plot)
-% axis image
-% axis tight
-% set(gca,'YDir','normal')   % <-- makes row-1 at bottom (droplet appears bottom)
-% colorbar
-% caxis([0 1])
-% title(sprintf('Phase field \\phi at step = %d', step))
-% drawnow
-% 
-% to check the droplet profile 
-% figure(1); clf
-% 
-% phi_plot = real(phi);
-% phi_plot(~isfinite(phi_plot)) = NaN;
-% 
-% imagesc(phi_plot)
-% axis image
-% axis tight
-% set(gca,'YDir','normal')   % <-- makes row-1 at bottom (droplet appears bottom)
-% colorbar
-% caxis([0 1])
-% % title(sprintf('Phase field \\phi at step = %d', step))
-% drawnow
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Uncomment it for observing the droplet
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%
-% 
-% figure(302); clf; set(gcf,'Color','w');
-% 
-% imagesc([1 size(X,2)], [1 size(Y,1)], phi);
-% axis image tight;
-% set(gca,'YDir','normal');           % origin at bottom-left
-% colormap('jet'); colorbar;
-% 
-% xlabel('x'); ylabel('y');
-% title(sprintf('Phase field  \\phi  (step %d)', step), ...
-%       'Interpreter','tex','FontSize',12);               
-% 
-% Optional: emphasize droplet interface (φ=0 contour)
-% hold on;
-% contour(X, Y, phi, [0 0], 'w', 'LineWidth', 1.2);
-% 
-% drawnow;
